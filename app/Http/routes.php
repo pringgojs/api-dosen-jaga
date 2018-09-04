@@ -10,6 +10,10 @@
 | and give it the controller to call when that URI is requested.
 |
 */
+Route::group(['prefix' => 'api'], function ()   {
+    Route::post('login', 'LoginController@login');
+});
+
 
 Route::get('/', 'WelcomeController@index');
 

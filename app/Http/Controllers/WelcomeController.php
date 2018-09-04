@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers;
 
+use App\Models\Jurusan;
 use App\Models\Mahasiswa;
 
 class WelcomeController extends Controller {
@@ -32,8 +33,8 @@ class WelcomeController extends Controller {
 	 */
 	public function index()
 	{
-		$mahasiswa = Mahasiswa::find(2033);
-		dd($mahasiswa);
+		$jurusan = Jurusan::find(98);
+		dd($jurusan->jurusan);
 	}
 
 }
