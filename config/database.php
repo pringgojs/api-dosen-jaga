@@ -91,6 +91,7 @@ return [
 			'database' => env('DB_DATABASE', ''),
 			'username' => env('DB_USERNAME', ''),
 			'password' => env('DB_PASSWORD', ''),
+			'charset' => 'AL32UTF8',
 			'prefix'   => '',
 		],
 
