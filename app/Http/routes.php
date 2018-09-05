@@ -11,7 +11,7 @@
 |
 */
 Route::group(['prefix' => 'api'], function ()   {
-    Route::get('login', 'LoginController@login');
+    Route::post('login', 'LoginController@login');
 });
 
 
