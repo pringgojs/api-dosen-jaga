@@ -17,23 +17,23 @@ class AuthHelper
             ->where('password', $password)
             ->where('staff', 4)
             ->first();
-        
+
         if ($lecturers) return $lecturers;
 
-        return null;
+        return 0;
     }
 
     public static function studentSignin($request)
     {
         $password = crypt($request->input('password'), 1234567890);
 
-        $lecturers = Mahasiswa::where('nrp', $request->input('username'))
+        $student = Mahasiswa::where('nrp', $request->input('username'))
             ->where('password', $password)
             ->where('status', 'A')
             ->first();
         
-        if ($lecturers) return $lecturers;
+        if ($student) return $student;
 
-        return null;
+        return 0;
     }
 }

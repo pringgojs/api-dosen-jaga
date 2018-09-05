@@ -17,7 +17,7 @@ class LoginController extends Controller {
 			$lecturer = AuthHelper::lecturerSignin($request);
 			return response()->json(
                 [
-					'status' => 1,
+					'status' => $lecturer ? 1 : 0,
 					'type' => 'lecturer',
                     'data' => $lecturer ? : 0,
                 ]
@@ -26,19 +26,14 @@ class LoginController extends Controller {
 
 		if ($request->input('type') == 'mahasiswa') {
 			$student = AuthHelper::studentSignin($request);
+
 			return response()->json(
                 [
-					'status' => 1,
+					'status' => $student ? 1 : 0,
 					'type' => 'student',
                     'data' => $student ? : 0,
                 ]
             );
 		}
-
-		return response()->json(
-			[
-				'status' => 0,
-			]
-		);
 	}
 }
