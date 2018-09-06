@@ -12,6 +12,11 @@
 */
 Route::group(['prefix' => 'api'], function ()   {
     Route::post('login', 'LoginController@login');
+	
+	// lecturer
+	Route::group(['prefix' => 'lecturer'], function ()   {
+		Route::post('index', 'LecturerController@index');
+	});
 });
 
 
