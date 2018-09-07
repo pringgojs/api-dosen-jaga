@@ -1,29 +1,20 @@
 <?php namespace App\Http\Controllers;
 
 use App\Http\Requests;
-use App\Models\Pegawai;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-class LecturerController extends Controller {
+use Illuminate\Http\Request;
+
+class ETugasController extends Controller {
 
 	/**
 	 * Display a listing of the resource.
 	 *
 	 * @return Response
 	 */
-	public function index(Request $request)
+	public function index()
 	{
-		$user = $request->input('user');
-		$lecturer = Pegawai::find($user['id']);
-		return response()->json(
-			[
-				'code' => 200,
-				'user' => $user,
-				'lecturer' => $lecturer,
-				'program_study' => $lecturer->programStudy,
-			]
-		);
+		//
 	}
 
 	/**
@@ -31,7 +22,7 @@ class LecturerController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function schedule()
+	public function create()
 	{
 		//
 	}

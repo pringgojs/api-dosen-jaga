@@ -15,7 +15,12 @@ Route::group(['prefix' => 'api'], function ()   {
 	
 	// lecturer
 	Route::group(['prefix' => 'lecturer'], function ()   {
+		Route::post('schedule', 'ScheduleController@index');
+
+
+
 		Route::post('index', 'LecturerController@index');
+		
 	});
 });
 
