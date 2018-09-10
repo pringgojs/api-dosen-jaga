@@ -20,6 +20,7 @@ class NilaiMasterModul extends Model
 				'jurusan.jurusan',
 				'program.program',
 				'kelas.pararel',
+				'kelas.kelas',
 				'nilai_master_modul.kuliah',
 				'nilai_master_modul.modul',
 				'nilai_master_modul.nomor as nomor_nilai_master_modul'
@@ -57,8 +58,7 @@ class NilaiMasterModul extends Model
 			->where('nilai_master_modul.kuliah', $kuliah_id)
 			->orderBy('kuliah.tahun', 'DESC')
 			->orderBy('kuliah.semester', 'DESC')
-			->orderBy('nilai_master_modul.nomor', 'DESC')
-			->get();
+			->orderBy('nilai_master_modul.nomor', 'DESC');
     }
 
 }

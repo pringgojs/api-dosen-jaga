@@ -19,7 +19,7 @@ class ScheduleController extends Controller {
 		$last_kuliah = Kuliah::max('nomor');
 		$kuliah = Kuliah::find($last_kuliah_user);
 		$list_semester = NilaiMasterModul::joinDependence($user['id'])
-			->groupBy('nilai_master_modul.modul')
+			->groupBy('nilai_master_modul.kuliah')
 			->orderBy('kuliah.tahun', 'DESC')
 			->orderBy('kuliah.semester', 'DESC')
 			->orderBy('nilai_master_modul.nomor', 'DESC')
