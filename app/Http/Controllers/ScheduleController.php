@@ -25,13 +25,7 @@ class ScheduleController extends Controller {
 			->orderBy('kuliah.semester', 'DESC')
 			->orderBy('nilai_master_modul.nomor', 'DESC')
 			->get();
-		\Log::info($list_semester->toArray());
-		$data =  NilaiMasterModul::joinDependence($user['id'])
-			->where('nilai_master_modul.kuliah', $last_kuliah_user)
-			->orderBy('kuliah.tahun', 'DESC')
-			->orderBy('kuliah.semester', 'DESC')
-			->orderBy('nilai_master_modul.nomor', 'DESC')
-			->get();
+		$data =  NilaiMasterModul::getDataBySemester($user['id'], $last_kuliah_user)->get();
 
 		return response()->json(
 			[
@@ -42,29 +36,16 @@ class ScheduleController extends Controller {
 		);
 	}
 
-	public function getBySemester(Request $request)
+	public function getBySemester(Request $request, $kuliah)
 	{
 		$user = $request->input('user');
-		$list_semester = NilaiMasterModul::joinDependence($user['id'])
-			->groupBy('kuliah.tahun')
-			->groupBy('kuliah.semester')
-			->orderBy('kuliah.tahun', 'DESC')
-			->orderBy('kuliah.semester', 'DESC')
-			->orderBy('nilai_master_modul.nomor', 'DESC')
-			->get();
-		\Log::info($list_semester->toArray());
-		$data =  NilaiMasterModul::joinDependence($user['id'])
-			->where('nilai_master_modul.kuliah', $last_kuliah_user)
-			->orderBy('kuliah.tahun', 'DESC')
-			->orderBy('kuliah.semester', 'DESC')
-			->orderBy('nilai_master_modul.nomor', 'DESC')
-			->get();
-
+		$kuliah = Kuliah::find($kuliah);
+		$data =  NilaiMasterModul::getDataBySemester($user['id'], $kuliah->nomor)->get();
+		
 		return response()->json(
 			[
 				'data' => $data,
-				'data_semester' => $list_semester,
-				'keterangan' => $last_kuliah == $last_kuliah_user ? 'saat ini' : 'semester lalu',
+				'keterangan' => 'semester ('.$kuliah->tahun.'/'.$kuliah->semester.')',
 			]
 		);
 	}

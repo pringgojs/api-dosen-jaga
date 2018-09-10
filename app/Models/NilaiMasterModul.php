@@ -49,6 +49,16 @@ class NilaiMasterModul extends Model
 	public function scopeJoinProgram($q)
     {
         $q->join('program', 'program.nomor', '=', 'kelas.program');
+	}
+	
+	public function scopeGetDataBySemester($q, $dosen_id, $kuliah_id)
+    {
+        $q->joinDependence($dosen_id)
+			->where('nilai_master_modul.kuliah', $kuliah_id)
+			->orderBy('kuliah.tahun', 'DESC')
+			->orderBy('kuliah.semester', 'DESC')
+			->orderBy('nilai_master_modul.nomor', 'DESC')
+			->get();
     }
 
 }
