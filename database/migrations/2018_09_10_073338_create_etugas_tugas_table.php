@@ -26,6 +26,11 @@ class CreateEtugasTugasTable extends Migration {
                 ->references('id')->on('kelas')
                 ->onUpdate('cascade')
 				->onDelete('cascade');
+			$table->integer('kuliah')->unsigned()->index('etugas_tkuliah_index')->nullable();
+            $table->foreign('kuliah', 'etugas_tkuliah_foreign')
+                ->references('id')->on('kuliah')
+                ->onUpdate('cascade')
+				->onDelete('cascade');
 			$table->integer('pegawai')->unsigned()->index('etugas_tdosen_index')->nullable();
             $table->foreign('pegawai', 'etugas_tdosen_foreign')
                 ->references('id')->on('pegawai')

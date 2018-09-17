@@ -26,7 +26,12 @@ class CreateEtugasMateriTable extends Migration {
             $table->foreign('kelas', 'etugas_kelas_foreign')
                 ->references('id')->on('kelas')
                 ->onUpdate('cascade')
-                ->onDelete('cascade');
+				->onDelete('cascade');
+			$table->integer('kuliah')->unsigned()->index('etugas_tkuliahx_index')->nullable();
+            $table->foreign('kuliah', 'etugas_tkuliahx_foreign')
+                ->references('id')->on('kuliah')
+                ->onUpdate('cascade')
+				->onDelete('cascade');
             $table->string('file_url')->nullable();
             $table->string('file_type')->nullable();
 			$table->string('file_size')->nullable();

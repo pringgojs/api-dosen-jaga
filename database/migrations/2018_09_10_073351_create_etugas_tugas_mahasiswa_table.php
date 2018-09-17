@@ -13,7 +13,7 @@ class CreateEtugasTugasMahasiswaTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('etugas_mahasiswa', function (Blueprint $table) {
+		Schema::create('etugas_nilai_mahasiswa', function (Blueprint $table) {
 			$table->increments('id');
 			$table->string('nrp');
 			$table->integer('nilai')->nullable()->unsigned();
@@ -42,7 +42,7 @@ class CreateEtugasTugasMahasiswaTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::dropIfExists('etugas_mahasiswa');
+		Schema::dropIfExists('etugas_nilai_mahasiswa');
 	}
 
 }
