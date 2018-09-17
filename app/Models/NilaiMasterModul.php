@@ -29,7 +29,7 @@ class NilaiMasterModul extends Model
 
 	public function scopeJoinKuliah($q)
     {
-        $q->join('kuliah', 'kuliah.nomor', '=', $this->table.'.kuliah');
+        $q->join('kuliah', 'kuliah.nomor', '=', 'nilai_master_modul.kuliah');
 	}
 
 	public function scopeJoinMataKuliah($q)

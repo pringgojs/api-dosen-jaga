@@ -10,6 +10,30 @@ use App\Http\Controllers\Controller;
 
 class MateriController extends Controller {
 
+	public function index(Request $request)
+	{
+		$user = $request->input('user');
+		$list_materi = Materi::joinNilaiMasterModul()
+			->joinDependence($user['id'])
+			->where('nilai_master_modul.pengasuh', $user['id'])
+			->get();
+		
+		$list_semester = Materi::joinNilaiMasterModul()
+			->joinDependence($user['id'])
+			->orderBy('kuliah.tahun', 'DESC')
+			->orderBy('kuliah.semester', 'DESC')
+			->orderBy('nilai_master_modul.nomor', 'DESC')
+			->get();
+
+		return response()->json(
+			[
+				'code' => 200,
+				'data' => $list_materi,
+				'data_semester' => $list_semester,
+			]
+		);
+	}
+
 	public function store(Request $request)
 	{
 		$user = $request->input('user');
@@ -38,6 +62,20 @@ class MateriController extends Controller {
 			[
 				'code' => 200,
 				'status' => 'Data saved',
+			]
+		);
+	}
+
+	public function delete(Request $request, $id)
+	{
+		$materi = Materi::find($id);
+		$url_file = $materi->file_url;
+		$materi->delete();
+
+		return response()->json(
+			[
+				'code' => 200,
+				'url' => $url_file,
 			]
 		);
 	}
