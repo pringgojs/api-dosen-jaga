@@ -15,9 +15,12 @@ class MateriController extends Controller {
 		$user = $request->input('user');
 		$list_materi = Materi::joinNilaiMasterModul()
 			->joinDependence($user['id'])
+			->orderBy('kuliah.tahun', 'DESC')
+			->orderBy('kuliah.semester', 'DESC')
+			->orderBy('nilai_master_modul.nomor', 'DESC')
 			->where('nilai_master_modul.pengasuh', $user['id'])
 			->get();
-		
+			
 		$list_semester = Materi::joinNilaiMasterModul()
 			->joinDependence($user['id'])
 			->orderBy('kuliah.tahun', 'DESC')
@@ -76,6 +79,37 @@ class MateriController extends Controller {
 			[
 				'code' => 200,
 				'url' => $url_file,
+			]
+		);
+	}
+
+	public function getByKuliah(Request $request)
+	{
+		$user = $request->input('user');
+		$kuliah = $request->input('kuliah');
+		$list_materi = Materi::joinNilaiMasterModul()
+			->joinDependence($user['id'])
+			->where('nilai_master_modul.kuliah', $kuliah)
+			->orderBy('kuliah.tahun', 'DESC')
+			->orderBy('kuliah.semester', 'DESC')
+			->orderBy('nilai_master_modul.nomor', 'DESC')
+			->where('nilai_master_modul.pengasuh', $user['id'])
+			->get();
+			
+		$list_semester = Materi::joinNilaiMasterModul()
+			->joinDependence($user['id'])
+			->where('nilai_master_modul.kuliah', $kuliah)
+			->orderBy('kuliah.tahun', 'DESC')
+			->orderBy('kuliah.semester', 'DESC')
+			->orderBy('nilai_master_modul.nomor', 'DESC')
+			->get();
+		\Log::info($list_materi);
+
+		return response()->json(
+			[
+				'code' => 200,
+				'data' => $list_materi,
+				'data_semester' => $list_semester,
 			]
 		);
 	}

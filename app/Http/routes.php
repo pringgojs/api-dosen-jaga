@@ -18,6 +18,7 @@ Route::group(['prefix' => 'api'], function ()   {
 		Route::post('schedule/get-by-semester/{kuliah}', 'ScheduleController@getBySemester');
 		Route::post('schedule', 'ScheduleController@index');
 		
+		Route::post('materi/get-by-kuliah', 'MateriController@getByKuliah');
 		Route::post('materi/delete/{id}', 'MateriController@delete');
 		Route::post('materi', 'MateriController@index');
 		Route::post('materi/store', 'MateriController@store');
