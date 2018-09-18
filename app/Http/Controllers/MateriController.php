@@ -13,6 +13,7 @@ class MateriController extends Controller {
 	public function index(Request $request)
 	{
 		$user = $request->input('user');
+
 		$list_materi = Materi::joinNilaiMasterModul()
 			->joinDependence($user['id'])
 			->orderBy('kuliah.tahun', 'DESC')
@@ -20,7 +21,6 @@ class MateriController extends Controller {
 			->orderBy('nilai_master_modul.nomor', 'DESC')
 			->where('nilai_master_modul.pengasuh', $user['id'])
 			->get();
-			
 		$list_semester = Materi::joinNilaiMasterModul()
 			->joinDependence($user['id'])
 			->orderBy('kuliah.tahun', 'DESC')

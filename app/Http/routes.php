@@ -21,14 +21,16 @@ Route::group(['prefix' => 'api'], function ()   {
 		// materi
 		Route::post('materi/get-by-kuliah', 'MateriController@getByKuliah');
 		Route::post('materi/delete/{id}', 'MateriController@delete');
-		Route::post('materi', 'MateriController@index');
 		Route::post('materi/store', 'MateriController@store');
+		Route::post('materi', 'MateriController@index');
 
 		// etugas
 		Route::post('e-tugas/get-by-kuliah', 'EtugasController@getByKuliah');
+		Route::post('e-tugas/update/{id}', 'EtugasController@update');
+		Route::post('e-tugas/edit/{id}', 'EtugasController@edit');
 		Route::post('e-tugas/delete/{id}', 'EtugasController@delete');
-		Route::post('materi', 'EtugasController@index');
 		Route::post('e-tugas/store', 'EtugasController@store');
+		Route::post('e-tugas', 'EtugasController@index');
 
 		Route::post('index', 'LecturerController@index');
 		
