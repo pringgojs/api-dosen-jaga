@@ -14,7 +14,30 @@ Route::group(['prefix' => 'api'], function ()   {
     Route::post('login', 'LoginController@login');
 	
 	// lecturer
-	Route::group(['prefix' => 'lecturer'], function ()   {
+	Route::group(['prefix' => 'lecturer', 'namespace' => 'Lecturer'], function ()   {
+		Route::post('schedule/get-by-semester/{kuliah}', 'ScheduleController@getBySemester');
+		Route::post('schedule', 'ScheduleController@index');
+		
+		// materi
+		Route::post('materi/get-by-kuliah', 'MateriController@getByKuliah');
+		Route::post('materi/delete/{id}', 'MateriController@delete');
+		Route::post('materi/store', 'MateriController@store');
+		Route::post('materi', 'MateriController@index');
+
+		// etugas
+		Route::post('e-tugas/get-by-kuliah', 'EtugasController@getByKuliah');
+		Route::post('e-tugas/update/{id}', 'EtugasController@update');
+		Route::post('e-tugas/edit/{id}', 'EtugasController@edit');
+		Route::post('e-tugas/delete/{id}', 'EtugasController@delete');
+		Route::post('e-tugas/store', 'EtugasController@store');
+		Route::post('e-tugas', 'EtugasController@index');
+
+		Route::post('index', 'LecturerController@index');
+		
+	});
+
+	// student
+	Route::group(['prefix' => 'student', 'namespace' => 'Student'], function ()   {
 		Route::post('schedule/get-by-semester/{kuliah}', 'ScheduleController@getBySemester');
 		Route::post('schedule', 'ScheduleController@index');
 		

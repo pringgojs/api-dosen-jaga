@@ -52,6 +52,12 @@ class NilaiMasterModul extends Model
         $q->join('program', 'program.nomor', '=', 'kelas.program');
 	}
 	
+	public function scopeJoinMahasiswa($q)
+    {
+        $q->join('mahasiswa', 'mahasiswa.kelas', '=', 'kelas.nomor');
+	}
+	
+
 	public function scopeGetDataBySemester($q, $dosen_id, $kuliah_id)
     {
         $q->joinDependence($dosen_id)

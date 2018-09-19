@@ -1,4 +1,4 @@
-<?php namespace App\Http\Controllers;
+<?php namespace App\Http\Controllers\Lecturer;
 
 use App\Helpers\AuthHelper;
 use Illuminate\Http\Request;

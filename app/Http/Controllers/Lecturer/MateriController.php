@@ -1,4 +1,4 @@
-<?php namespace App\Http\Controllers;
+<?php namespace App\Http\Controllers\Lecturer;
 
 use App\Http\Requests;
 use App\Models\Kuliah;
