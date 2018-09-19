@@ -19,7 +19,10 @@ class ScheduleController extends Controller {
 		$student = Mahasiswa::find($user['id']);
 		$list_schedule = NilaiMasterModul::joinKuliah()
 			->joinKelas()
+			->joinJurusan()
+			->joinProgram()
 			->joinMahasiswa()
+			->joinMatakuliah()
 			->where('mahasiswa.nomor', $user['id'])
 			->whereRaw('kuliah.tahun = (SELECT max(tahun) from kuliah where kelas = '.$student->kelas.') and kuliah.semester = (SELECT max(semester) from kuliah where kelas = '.$student->kelas.')')
 			->select([
@@ -27,6 +30,9 @@ class ScheduleController extends Controller {
 				'kuliah.semester',
 				'kelas.pararel',
 				'kelas.kelas',
+				'program.program',
+				'jurusan.jurusan',
+				'matakuliah.matakuliah',
 				'nilai_master_modul.kuliah',
 				'nilai_master_modul.modul',
 				'nilai_master_modul.nomor as nomor_nilai_master_modul'
