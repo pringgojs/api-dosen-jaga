@@ -36,6 +36,11 @@ class Tugas extends Model
 	public function scopeJoinNilaiMasterModul($q)
     {
         $q->join('nilai_master_modul', 'nilai_master_modul.nomor', '=', $this->table.'.nilai_master_modul');
+	}
+	
+	public function scopeJoinDosen($q)
+    {
+        $q->join('pegawai', 'pegawai.nomor', '=', 'nilai_master_modul.pengasuh');
     }
     
     public function scopeJoinKuliah($q)
@@ -61,5 +66,59 @@ class Tugas extends Model
 	public function scopeJoinProgram($q)
     {
         $q->join('program', 'program.nomor', '=', 'kelas.program');
+	}
+
+	public function scopeGetDataTugas($q, $kelas, $kuliah="")
+	{
+		$q->joinNilaiMasterModul()
+			->joinKuliah()
+			->joinKelas()
+			->joinJurusan()
+			->joinProgram()
+			->joinMatakuliah()
+			->joinDosen()
+			->where('etugas_tugas.kelas', $kelas)
+			->whereRaw('kuliah.tahun = (SELECT max(tahun) from kuliah where kelas = '.$kelas.') and kuliah.semester = (SELECT max(semester) from kuliah where kelas = '.$kelas.')')
+			->where(function($query) use ($kuliah) {
+				if ($kuliah) {
+					$query->where('etugas_tugas.kuliah', $kuliah);
+				}
+			})
+			->select([
+				'kuliah.tahun',
+				'kuliah.semester',
+				'kelas.pararel',
+				'kelas.kelas',
+				'program.program',
+				'etugas_tugas.judul',
+				'etugas_tugas.keterangan',
+				'etugas_tugas.file_url',
+				'etugas_tugas.due_date',
+				'etugas_tugas.id',
+				'pegawai.nama',
+				'jurusan.jurusan',
+				'matakuliah.matakuliah',
+				'nilai_master_modul.kuliah',
+				'nilai_master_modul.modul',
+				'nilai_master_modul.nomor as nomor_nilai_master_modul'
+			])
+			->orderBy('kuliah.tahun', 'DESC')
+			->orderBy('kuliah.semester', 'DESC')
+			->orderBy('nilai_master_modul.nomor', 'DESC');
+	}
+
+	public function scopeGetDataByKuliah($q, $kelas)
+	{
+		$q->joinNilaiMasterModul()
+			->joinKuliah()
+			->joinMatakuliah()
+			->where('etugas_tugas.kelas', $kelas)
+			->select([
+				'matakuliah.matakuliah',
+				'kuliah.tahun',
+				'kuliah.semester',
+				'etugas_tugas.kuliah'
+			])
+			->groupBy('etugas_tugas.kuliah');
 	}
 }
