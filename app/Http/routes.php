@@ -42,9 +42,7 @@ Route::group(['prefix' => 'api'], function ()   {
 		Route::post('schedule', 'ScheduleController@index');
 		
 		// materi
-		Route::post('materi/get-by-kuliah', 'MateriController@getByKuliah');
-		Route::post('materi/delete/{id}', 'MateriController@delete');
-		Route::post('materi/store', 'MateriController@store');
+		Route::post('materi/kuliah/{id}', 'MateriController@kuliah');
 		Route::post('materi', 'MateriController@index');
 
 		// etugas

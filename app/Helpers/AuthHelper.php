@@ -26,7 +26,7 @@ class AuthHelper
     public static function studentSignin($request)
     {
         $password = crypt($request->input('password'), 1234567890);
-
+        
         $student = Mahasiswa::where('nrp', $request->input('username'))
             ->where('password', $password)
             ->where('status', 'A')

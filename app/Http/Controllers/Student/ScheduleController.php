@@ -17,6 +17,7 @@ class ScheduleController extends Controller {
 	{
 		$user = $request->input('user');
 		$student = Mahasiswa::find($user['id']);
+
 		$list_schedule = NilaiMasterModul::joinKuliah()
 			->joinKelas()
 			->joinJurusan()
@@ -43,80 +44,11 @@ class ScheduleController extends Controller {
 			->orderBy('kuliah.semester', 'DESC')
 			->orderBy('nilai_master_modul.nomor', 'DESC')
 			->get();
-
 		return response()->json(
 			[
 				'data' => $list_schedule,
 			]
 		);
-	}
-
-	public function getBySemester(Request $request, $kuliah)
-	{
-		$user = $request->input('user');
-		$kuliah = Kuliah::find($kuliah);
-		$data =  NilaiMasterModul::getDataBySemester($user['id'], $kuliah->nomor)->get();
-		
-		return response()->json(
-			[
-				'data' => $data,
-				'keterangan' => 'semester ('.$kuliah->tahun.'/'.$kuliah->semester.')',
-			]
-		);
-	}
-
-	/**
-	 * Store a newly created resource in storage.
-	 *
-	 * @return Response
-	 */
-	public function store()
-	{
-		//
-	}
-
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id)
-	{
-		//
-	}
-
-	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function edit($id)
-	{
-		//
-	}
-
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update($id)
-	{
-		//
-	}
-
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function destroy($id)
-	{
-		//
 	}
 
 }

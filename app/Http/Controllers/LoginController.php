@@ -1,4 +1,4 @@
-<?php namespace App\Http\Controllers\Lecturer;
+<?php namespace App\Http\Controllers;
 
 use App\Helpers\AuthHelper;
 use Illuminate\Http\Request;
@@ -23,7 +23,6 @@ class LoginController extends Controller {
                 ]
             );
 		}
-
 		if ($request->input('type') == 'mahasiswa') {
 			$student = AuthHelper::studentSignin($request);
 

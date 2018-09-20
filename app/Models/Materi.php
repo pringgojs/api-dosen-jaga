@@ -61,4 +61,60 @@ class Materi extends Model
     {
         $q->join('program', 'program.nomor', '=', 'kelas.program');
 	}
+	
+	public function scopeJoinMahasiswa($q)
+    {
+        $q->join('mahasiswa', 'mahasiswa.kelas', '=', 'kuliah.kelas');
+	}
+
+	public function scopeGetDataByKuliah($q, $kelas)
+	{
+		$q->joinNilaiMasterModul()
+			->joinKuliah()
+			->joinMatakuliah()
+			->where('etugas_materi.kelas', $kelas)
+			->select([
+				'matakuliah.matakuliah',
+				'kuliah.tahun',
+				'kuliah.semester',
+				'etugas_materi.kuliah'
+			])
+			->groupBy('etugas_materi.kuliah');
+	}
+
+	public function scopeGetDataMateri($q, $kelas, $kuliah="")
+	{
+		$q->joinNilaiMasterModul()
+			->joinKuliah()
+			->joinKelas()
+			->joinJurusan()
+			->joinProgram()
+			->joinMatakuliah()
+			->where('etugas_materi.kelas', $kelas)
+			->whereRaw('kuliah.tahun = (SELECT max(tahun) from kuliah where kelas = '.$kelas.') and kuliah.semester = (SELECT max(semester) from kuliah where kelas = '.$kelas.')')
+			->where(function($query) use ($kuliah) {
+				if ($kuliah) {
+					$query->where('etugas_materi.kuliah', $kuliah);
+				}
+			})
+			->select([
+				'kuliah.tahun',
+				'kuliah.semester',
+				'kelas.pararel',
+				'kelas.kelas',
+				'program.program',
+				'etugas_materi.judul',
+				'etugas_materi.keterangan',
+				'etugas_materi.file_url',
+				'jurusan.jurusan',
+				'matakuliah.matakuliah',
+				'nilai_master_modul.kuliah',
+				'nilai_master_modul.modul',
+				'nilai_master_modul.nomor as nomor_nilai_master_modul'
+			])
+			->orderBy('kuliah.tahun', 'DESC')
+			->orderBy('kuliah.semester', 'DESC')
+			->orderBy('nilai_master_modul.nomor', 'DESC');
+	}
+	
 }
