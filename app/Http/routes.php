@@ -46,6 +46,7 @@ Route::group(['prefix' => 'api'], function ()   {
 		Route::post('materi', 'MateriController@index');
 
 		// etugas
+		Route::post('etugas/detail/{id}', 'EtugasController@detail');
 		Route::post('etugas', 'EtugasController@index');
 
 		Route::post('index', 'LecturerController@index');

@@ -9,6 +9,16 @@ class NilaiMasterModul extends Model
 	protected $primaryKey = 'nomor';
 	public $timestamps = true;
 
+	public function pegawai()
+    {
+        return $this->belongsTo('App\Models\Pegawai', 'pengasuh');
+	}
+
+	public function toKuliah()
+    {
+        return $this->belongsTo('App\Models\Kuliah', 'kuliah');
+	}
+
 	public function scopeJoinDependence($q, $dosen_id)
     {
 		$q->joinKuliah()->joinMatakuliah()->joinKelas()->joinJurusan()->joinProgram()

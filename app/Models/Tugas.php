@@ -8,6 +8,27 @@ class Tugas extends Model
 	protected $table = 'etugas_tugas';   
 	public $timestamps = false;
 
+	public function toKelas()
+    {
+        return $this->belongsTo('App\Models\Kelas', 'kelas');
+	}
+
+	public function toKuliah()
+    {
+        return $this->belongsTo('App\Models\Kuliah', 'kuliah');
+	}
+
+	public function nilaiMasterModul()
+    {
+        return $this->belongsTo('App\Models\NilaiMasterModul', 'nilai_master_modul');
+	}
+
+	public function toPegawai()
+    {
+        return $this->belongsTo('App\Models\Pegawai', 'pegawai');
+	}
+	
+
 	public function scopeJoinDependence($q, $dosen_id)
     {
 		$q->joinKuliah()->joinMatakuliah()->joinKelas()->joinJurusan()->joinProgram()

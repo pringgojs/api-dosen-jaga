@@ -5,6 +5,7 @@ use App\Http\Requests;
 use App\Models\Kuliah;
 use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
+use App\Models\NilaiMahasiswa;
 use App\Models\NilaiMasterModul;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -35,6 +36,24 @@ class EtugasController extends Controller {
 		return response()->json(
 			[
 				'data' => $list_materi,
+				'data_semester' => $list_semester,
+			]
+		);
+	}
+
+	public function detail(Request $request, $id)
+	{
+		$user = $request->input('user');
+		$student = Mahasiswa::find($user['id']);
+		$etugas = Tugas::find($id);
+		$nilai_mahasiswa = NilaiMahasiswa::where('tugas_id', $etugas->id)->first();
+
+		return response()->json(
+			[
+				'etugas' => $etugas,
+				'etugas_kelas' => $etugas->toKelas,
+				'etugas_kuliah' => $etugas->toKuliah,
+				'etugas_pegawai' => $etugas->toPegawai,
 				'data_semester' => $list_semester,
 			]
 		);
