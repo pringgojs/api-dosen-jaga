@@ -77,7 +77,6 @@ class EtugasController extends Controller {
 		$tugas->file_url = $file ? $file['original_path'] : null;
 		$tugas->file_size = $file ? $file['original_size'] : null;
 		$tugas->file_type = $file ? $file['original_extension'] : null;
-		$tugas->created_at = date('Y-m-d h:i:s');
 		$tugas->save();
 
 		DB::commit();

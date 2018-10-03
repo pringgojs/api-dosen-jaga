@@ -31,7 +31,7 @@ class CreateEtugasTugasMahasiswaTable extends Migration {
             $table->string('file_url')->nullable();
             $table->string('file_type')->nullable();
             $table->string('file_size')->nullable();
-            $table->timestamp('created_at');
+            $table->timestamps();
         });
 	}
 
