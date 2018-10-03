@@ -23,6 +23,11 @@ class Tugas extends Model
         return $this->belongsTo('App\Models\NilaiMasterModul', 'nilai_master_modul');
 	}
 
+	public function nilaiMahasiswa()
+    {
+        return $this->belongsTo('App\Models\NilaiMahasiswa', 'tugas_id');
+	}
+
 	public function toPegawai()
     {
         return $this->belongsTo('App\Models\Pegawai', 'pegawai');
@@ -57,6 +62,11 @@ class Tugas extends Model
 	public function scopeJoinNilaiMasterModul($q)
     {
         $q->join('nilai_master_modul', 'nilai_master_modul.nomor', '=', $this->table.'.nilai_master_modul');
+	}
+	
+	public function scopeJoinNilaiMahasiswa($q)
+    {
+        $q->join('etugas_nilai_mahasiswa', 'etugas_nilai_mahasiswa.tugas', '=', $this->table.'.id');
 	}
 	
 	public function scopeJoinDosen($q)
