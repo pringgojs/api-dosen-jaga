@@ -69,14 +69,18 @@ class EtugasController extends Controller {
 		$file = $request->input('file');
 		$request = $request->input('request');
 		DB::beginTransaction();
-		$tugas = NilaiMahasiswa::where('tugas_id', $request['tugas_id'])->where('nrp', $user['username'])->first() ? :  new NilaiMahasiswa;
+		$etugas_find = NilaiMahasiswa::where('tugas_id', $request['tugas_id'])->where('nrp', $user['username'])->first();
+		$tugas = $etugas_find ?  :  new NilaiMahasiswa;
 		$tugas->nrp = $user['username'];
 		$tugas->keterangan = $request['keterangan'];
 		$tugas->tugas_id = $request['tugas_id'];
 		$tugas->kelas = $request['kelas_id'];
-		$tugas->file_url = $file ? $file['original_path'] : null;
-		$tugas->file_size = $file ? $file['original_size'] : null;
-		$tugas->file_type = $file ? $file['original_extension'] : null;
+		if ($file) {
+			$tugas->file_url = $file ? $file['original_path'] : null;
+			$tugas->file_size = $file ? $file['original_size'] : null;
+			$tugas->file_type = $file ? $file['original_extension'] : null;
+		}
+		
 		$tugas->save();
 
 		DB::commit();
