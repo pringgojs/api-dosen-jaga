@@ -7,4 +7,9 @@ class NilaiMahasiswa extends Model
 {
 	protected $table = 'etugas_nilai_mahasiswa';   
 	public $timestamps = true;
+
+	public function tugas()
+    {
+        return $this->belongsTo('App\Models\Tugas', 'tugas_id');
+	}
 }

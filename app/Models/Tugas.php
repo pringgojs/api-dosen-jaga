@@ -25,7 +25,7 @@ class Tugas extends Model
 
 	public function nilaiMahasiswa()
     {
-        return $this->belongsTo('App\Models\NilaiMahasiswa', 'tugas_id');
+        return $this->hasMany('App\Models\NilaiMahasiswa', 'tugas_id');
 	}
 
 	public function toPegawai()

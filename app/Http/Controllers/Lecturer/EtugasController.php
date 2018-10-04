@@ -1,12 +1,13 @@
 <?php namespace App\Http\Controllers\Lecturer;
 
-use App\Http\Requests;
 use App\Models\Tugas;
+use App\Http\Requests;
 use App\Models\Kuliah;
-use App\Models\NilaiMasterModul;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\NilaiMahasiswa;
+use App\Models\NilaiMasterModul;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 
 class EtugasController extends Controller {
 
@@ -169,6 +170,61 @@ class EtugasController extends Controller {
 				'code' => 200,
 				'data' => $list_tugas,
 				'data_semester' => $list_semester,
+			]
+		);
+	}
+
+	public function detail(Request $request, $id)
+	{
+		$user = $request->input('user');
+		$etugas = Tugas::find($id);
+		$kelas_mahasiswa = $etugas->toKelas->mahasiswa->map(function ($item) use ($etugas) {
+			$item['nilai'] = NilaiMahasiswa::where('tugas_id', $etugas->id)->where('nrp', $item['nrp'])->first();
+			return $item;
+		});
+		return response()->json(
+			[
+				'etugas' => $etugas,
+				'etugas_kelas' => $etugas->toKelas,
+				'etugas_kelas_mahasiswa' => $kelas_mahasiswa,
+				'etugas_kuliah' => $etugas->toKuliah,
+				'etugas_pegawai' => $etugas->toPegawai,
+				'etugas_matakuliah' => $etugas->toKuliah->mataKuliah,
+				'etugas_modul' => $etugas->nilaiMasterModul,
+				'etugas_nilai_mahasiswa' => $etugas->nilaiMahasiswa,
+			]
+		);
+	}
+
+	public function setNilai(Request $request)
+	{
+		$user = $request->input('user');
+		$request = $request->input('request');
+		DB::beginTransaction();
+
+		$nilai_mahasiswa = NilaiMahasiswa::find($request['tugas_id']);
+
+		$updated_at = $nilai_mahasiswa->updated_at;
+		$nilai_mahasiswa->nilai = $request['nilai'];
+		$nilai_mahasiswa->updated_at = $updated_at;
+		$nilai_mahasiswa->save();
+
+		DB::commit();
+		$tugas = $nilai_mahasiswa->tugas;
+		$kelas_mahasiswa = $tugas->toKelas->mahasiswa->map(function ($item) use ($tugas) {
+			$item['nilai'] = NilaiMahasiswa::where('tugas_id', $tugas->id)->where('nrp', $item['nrp'])->first();
+			return $item;
+		});
+		return response()->json(
+			[
+				'etugas' => $tugas,
+				'etugas_kelas' => $tugas->toKelas,
+				'etugas_kelas_mahasiswa' => $kelas_mahasiswa,
+				'etugas_kuliah' => $tugas->toKuliah,
+				'etugas_pegawai' => $tugas->toPegawai,
+				'etugas_matakuliah' => $tugas->toKuliah->mataKuliah,
+				'etugas_modul' => $tugas->nilaiMasterModul,
+				'etugas_nilai_mahasiswa' => $tugas->nilaiMahasiswa,
 			]
 		);
 	}

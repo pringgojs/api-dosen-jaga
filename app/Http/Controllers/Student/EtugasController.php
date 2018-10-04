@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers\Student;
 
+use Carbon\Carbon;
 use App\Models\Tugas;
 use App\Http\Requests;
 use App\Models\Kuliah;
@@ -22,6 +23,7 @@ class EtugasController extends Controller {
 			$item['nilai_mahasiswa'] = NilaiMahasiswa::where('tugas_id', $item->id)->where('nrp', $user['username'])->first() ? : null;
     		return $item;
 		});
+		
 		return response()->json(
 			[
 				'data' => $list_tugas,
@@ -68,6 +70,7 @@ class EtugasController extends Controller {
 		$user = $request->input('user');
 		$file = $request->input('file');
 		$request = $request->input('request');
+
 		DB::beginTransaction();
 		$etugas_find = NilaiMahasiswa::where('tugas_id', $request['tugas_id'])->where('nrp', $user['username'])->first();
 		$tugas = $etugas_find ?  :  new NilaiMahasiswa;
@@ -80,16 +83,17 @@ class EtugasController extends Controller {
 			$tugas->file_size = $file ? $file['original_size'] : null;
 			$tugas->file_type = $file ? $file['original_extension'] : null;
 		}
-		
+		$tugas->updated_at = Carbon::now();
 		$tugas->save();
-
 		DB::commit();
+
 		$student = Mahasiswa::find($user['id']);
 		$list_tugas = Tugas::getDataTugas($student->kelas)->get();
 		$list_tugas = $list_tugas->map(function ($item) use($user) {
 			$item['nilai_mahasiswa'] = NilaiMahasiswa::where('tugas_id', $item->id)->where('nrp', $user['username'])->first() ? : null;
     		return $item;
 		});
+
 		return response()->json(
 			[
 				'code' => 200,
