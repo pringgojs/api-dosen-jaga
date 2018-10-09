@@ -18,6 +18,10 @@ Route::group(['prefix' => 'api'], function ()   {
 		Route::post('schedule/get-by-semester/{kuliah}', 'ScheduleController@getBySemester');
 		Route::post('schedule', 'ScheduleController@index');
 		
+		// Report
+		Route::post('report/nilai-permodul/kuliah', 'ReportController@kuliah');
+		Route::post('report/nilai-permodul', 'ReportController@nilaiPermodul');
+
 		// materi
 		Route::post('materi/get-by-kuliah', 'MateriController@getByKuliah');
 		Route::post('materi/delete/{id}', 'MateriController@delete');
