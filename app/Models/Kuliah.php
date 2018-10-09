@@ -13,4 +13,9 @@ class Kuliah extends Model
     {
         return $this->belongsTo('App\Models\MataKuliah', 'matakuliah');
 	}
+
+	public function toKelas()
+    {
+        return $this->belongsTo('App\Models\Kelas', 'kelas');
+	}
 }
