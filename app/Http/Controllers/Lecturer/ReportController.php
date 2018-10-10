@@ -3,9 +3,11 @@
 use App\Models\Tugas;
 use App\Http\Requests;
 use App\Models\Kuliah;
+use App\Models\NilaiModul;
 use Illuminate\Http\Request;
 use App\Models\NilaiMahasiswa;
 use App\Models\NilaiMasterModul;
+use App\Models\NilaiModulDetail;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
@@ -91,6 +93,45 @@ class ReportController extends Controller {
 				'list_etugas_by_master_modul' => $list_etugas_by_master_modul,
 				'kelas_mahasiswa' => $kelas_mahasiswa,
 				'mata_kuliah' => $nilai_master_modul->toKuliah->mataKuliah
+			]
+		);
+	}
+
+	public function sync(Request $request)
+	{
+		$user = $request->input('user');
+		$master_modul_id = $request->input('id_modul');
+		
+		$table_headers = ['NIM', 'Nama'];
+		$nilai_master_modul = NilaiMasterModul::find($master_modul_id);
+		$list_etugas_by_master_modul = Tugas::where('nilai_master_modul', $master_modul_id)->where('pegawai', $user['id'])->get();
+		$list_mahasiswa = $nilai_master_modul->toKuliah->toKelas->mahasiswa;
+		
+		foreach ($list_mahasiswa as $mahasiswa) {
+			$rata = 0;
+			foreach ($list_etugas_by_master_modul as $etugas) {
+				$nilai = NilaiMahasiswa::where('tugas_id', $etugas->id)->where('nrp', $mahasiswa->nrp)->first();
+				$nilai = $nilai ? $nilai->nilai : 0 ;
+				$rata += $nilai;
+			}
+
+			$nilai_modul = NilaiModul::joinNilaiModulDetail()->where('nilai_modul.mahasiswa', $mahasiswa->nomor)
+				->where('nilai_modul.kuliah', $nilai_master_modul->kuliah)
+				->where('nilai_modul_detil.nilai_master_modul', $nilai_master_modul->nomor)
+				->first();
+			\Log::info('nomor mhs ' . $mahasiswa->nomor);
+			\Log::info('kuliah ' .$nilai_master_modul->kuliah);
+			\Log::info('nilai_master_modul ' .$nilai_master_modul->nomor);
+			\Log::info($nilai_modul);
+
+			// $item['rata_rata'] = $rata / $list_etugas_by_master_modul->count();
+			// return $item;
+		};
+		
+		
+		return response()->json(
+			[
+				'status' => 'ok'
 			]
 		);
 	}

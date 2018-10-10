@@ -8,4 +8,9 @@ class NilaiModul extends Model
 	protected $table = 'nilai_modul';   
 	protected $primaryKey = 'nomor';
 	public $timestamps = false;
+
+	public function scopeJoinNilaiModulDetail($q)
+    {
+        $q->join('nilai_modul_detil', 'nilai_modul_detil.nilai_modul', '=', 'nilai_modul.nomor');
+	}
 }

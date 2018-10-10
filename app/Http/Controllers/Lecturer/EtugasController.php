@@ -77,6 +77,7 @@ class EtugasController extends Controller {
 		$last_kuliah = Kuliah::max('nomor');
 		$kuliah = Kuliah::find($last_kuliah_user);
 		$list_semester = NilaiMasterModul::joinDependence($user['id'])
+			->where('matakuliah.masuk_penilaian', 2)
 			->groupBy('nilai_master_modul.kuliah')
 			->orderBy('kuliah.tahun', 'DESC')
 			->orderBy('kuliah.semester', 'DESC')
@@ -84,7 +85,6 @@ class EtugasController extends Controller {
 			->get();
 		$tugas = Tugas::find($id);
 		$data =  NilaiMasterModul::getDataBySemester($user['id'], $tugas->kuliah)->get();
-		\Log::info($data);
 		return response()->json(
 			[
 				'data_modul' => $data,

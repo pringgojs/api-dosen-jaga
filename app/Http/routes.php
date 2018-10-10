@@ -19,6 +19,7 @@ Route::group(['prefix' => 'api'], function ()   {
 		Route::post('schedule', 'ScheduleController@index');
 		
 		// Report
+		Route::post('report/nilai-permodul/sync', 'ReportController@sync');
 		Route::post('report/nilai-permodul/detail', 'ReportController@detail');
 		Route::post('report/nilai-permodul/kuliah', 'ReportController@kuliah');
 		Route::post('report/nilai-permodul', 'ReportController@nilaiPermodul');
