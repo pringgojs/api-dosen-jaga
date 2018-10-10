@@ -109,10 +109,12 @@ class Tugas extends Model
 			->joinMatakuliah()
 			->joinDosen()
 			->where('etugas_tugas.kelas', $kelas)
-			->whereRaw('kuliah.tahun = (SELECT max(tahun) from kuliah where kelas = '.$kelas.') and kuliah.semester = (SELECT max(semester) from kuliah where kelas = '.$kelas.')')
-			->where(function($query) use ($kuliah) {
+			
+			->where(function($query) use ($kuliah, $kelas) {
 				if ($kuliah) {
 					$query->where('etugas_tugas.kuliah', $kuliah);
+				} else {
+					$query->whereRaw('kuliah.tahun = (SELECT max(tahun) from kuliah where kelas = '.$kelas.') and kuliah.semester = (SELECT max(semester) from kuliah where kelas = '.$kelas.')');
 				}
 			})
 			->select([

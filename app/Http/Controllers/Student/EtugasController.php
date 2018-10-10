@@ -17,13 +17,12 @@ class EtugasController extends Controller {
 	{
 		$user = $request->input('user');
 		$student = Mahasiswa::find($user['id']);
-		$list_tugas = Tugas::getDataTugas($student->kelas)->get();
 		$list_semester = Tugas::getDataByKuliah($student->kelas)->get();
+		$list_tugas = Tugas::getDataTugas($student->kelas)->get();
 		$list_tugas = $list_tugas->map(function ($item) use($user) {
 			$item['nilai_mahasiswa'] = NilaiMahasiswa::where('tugas_id', $item->id)->where('nrp', $user['username'])->first() ? : null;
     		return $item;
 		});
-		
 		return response()->json(
 			[
 				'data' => $list_tugas,
@@ -37,10 +36,14 @@ class EtugasController extends Controller {
 		$user = $request->input('user');
 		$student = Mahasiswa::find($user['id']);
 		$list_semester = Tugas::getDataByKuliah($student->kelas)->get();
-		$list_materi = Tugas::getDataTugas($student->kelas, $kuliah)->get();
+		$list_tugas = Tugas::getDataTugas($student->kelas, $kuliah)->get();
+		$list_tugas = $list_tugas->map(function ($item) use($user) {
+			$item['nilai_mahasiswa'] = NilaiMahasiswa::where('tugas_id', $item->id)->where('nrp', $user['username'])->first() ? : null;
+    		return $item;
+		});
 		return response()->json(
 			[
-				'data' => $list_materi,
+				'data' => $list_tugas,
 				'data_semester' => $list_semester,
 			]
 		);
@@ -83,6 +86,7 @@ class EtugasController extends Controller {
 			$tugas->file_size = $file ? $file['original_size'] : null;
 			$tugas->file_type = $file ? $file['original_extension'] : null;
 		}
+		$tugas->created_at = Carbon::now();
 		$tugas->updated_at = Carbon::now();
 		$tugas->save();
 		DB::commit();
