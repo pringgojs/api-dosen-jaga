@@ -206,7 +206,6 @@ class EtugasController extends Controller {
 
 		$updated_at = $nilai_mahasiswa->updated_at;
 		$nilai_mahasiswa->nilai = $request['nilai'];
-		$nilai_mahasiswa->updated_at = $updated_at;
 		$nilai_mahasiswa->save();
 
 		DB::commit();

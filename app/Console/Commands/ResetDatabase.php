@@ -62,7 +62,7 @@ class ResetDatabase extends Command
         DB::beginTransaction();
         DB::statement('SET FOREIGN_KEY_CHECKS = 0');
 
-        $array = array('jurusan', 'kelas', 'kuliah', 'mahasiswa', 'matakuliah', 'nilai_master_modul', 'pegawai', 'program', 'program_studi');
+        $array = array('jurusan', 'kelas', 'kuliah', 'mahasiswa', 'matakuliah', 'nilai_master_modul', 'pegawai', 'program', 'program_studi', 'nilai_modul', 'nilai_modul_detail');
         
         foreach(DB::select('SHOW TABLES') as $table) {
             $table_array = get_object_vars($table);
