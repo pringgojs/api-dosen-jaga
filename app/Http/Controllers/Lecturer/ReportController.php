@@ -59,9 +59,6 @@ class ReportController extends Controller {
 	{
 		$user = $request->input('user');
 		$master_modul_id = $request->input('id_modul');
-		/**
-		 * 1. Data tugas (rata-rata)
-		 */
 		$table_headers = ['NIM', 'Nama'];
 		$nilai_master_modul = NilaiMasterModul::find($master_modul_id);
 		
@@ -106,7 +103,6 @@ class ReportController extends Controller {
 		$nilai_master_modul = NilaiMasterModul::find($master_modul_id);
 		$list_etugas_by_master_modul = Tugas::where('nilai_master_modul', $master_modul_id)->where('pegawai', $user['id'])->get();
 		$list_mahasiswa = $nilai_master_modul->toKuliah->toKelas->mahasiswa;
-		
 		foreach ($list_mahasiswa as $mahasiswa) {
 			$rata = 0;
 			foreach ($list_etugas_by_master_modul as $etugas) {
@@ -119,15 +115,21 @@ class ReportController extends Controller {
 				->where('nilai_modul.kuliah', $nilai_master_modul->kuliah)
 				->where('nilai_modul_detil.nilai_master_modul', $nilai_master_modul->nomor)
 				->first();
-			\Log::info('nomor mhs ' . $mahasiswa->nomor);
-			\Log::info('kuliah ' .$nilai_master_modul->kuliah);
-			\Log::info('nilai_master_modul ' .$nilai_master_modul->nomor);
+			$nilai_modul = NilaiModul::joinNilaiModulDetail()->where('nilai_modul.mahasiswa', 2024)
+				->where('nilai_modul.kuliah', $nilai_master_modul->kuliah)
+				->where('nilai_modul_detil.nilai_master_modul', $nilai_master_modul->nomor)
+				->first();
+			\Log::info('kuliah .'.$nilai_master_modul->kuliah);
+			\Log::info('$nilai_master_modul ' . $nilai_master_modul->nomor);
+			\Log::info('mahasiswa ' . $mahasiswa->nomor);
 			\Log::info($nilai_modul);
-
-			// $item['rata_rata'] = $rata / $list_etugas_by_master_modul->count();
-			// return $item;
+			if ($nilai_modul) {
+				$nilai_modul_detail = NilaiModulDetail::where('nilai_modul', $nilai_modul->nomor)->where('nilai_master_modul', $nilai_master_modul->nomor)->first();
+				if ($nilai_modul_detail) \Log::info('ok');
+				// $nilai_modul_detail->n = $rata;
+				// $nilai_modul_detail->save();
+			}
 		};
-		
 		
 		return response()->json(
 			[
