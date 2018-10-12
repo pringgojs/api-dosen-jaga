@@ -114,7 +114,7 @@ class Tugas extends Model
 				if ($kuliah) {
 					$query->where('etugas_tugas.kuliah', $kuliah);
 				} else {
-					$query->whereRaw('kuliah.tahun = (SELECT max(tahun) from kuliah where kelas = '.$kelas.') and kuliah.semester = (SELECT max(semester) from kuliah where kelas = '.$kelas.')');
+					// $query->whereRaw('kuliah.tahun = (SELECT max(tahun) from kuliah where kelas = '.$kelas.') and kuliah.semester = (SELECT max(semester) from kuliah where kelas = '.$kelas.')');
 				}
 			})
 			->select([

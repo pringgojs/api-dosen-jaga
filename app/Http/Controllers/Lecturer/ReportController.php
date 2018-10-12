@@ -3,6 +3,7 @@
 use App\Models\Tugas;
 use App\Http\Requests;
 use App\Models\Kuliah;
+use App\Models\Mahasiswa;
 use App\Models\NilaiModul;
 use Illuminate\Http\Request;
 use App\Models\NilaiMahasiswa;
@@ -96,14 +97,20 @@ class ReportController extends Controller {
 
 	public function sync(Request $request)
 	{
+		\Log::info('log');
+
 		$user = $request->input('user');
 		$master_modul_id = $request->input('id_modul');
 		
 		$table_headers = ['NIM', 'Nama'];
 		$nilai_master_modul = NilaiMasterModul::find($master_modul_id);
+		$list_nilai_modul = NilaiModul::where('kuliah', $nilai_master_modul->kuliah)->get();
+		\Log::info('kuliha ' . $nilai_master_modul->kuliah);
+		\Log::info($list_nilai_modul);
 		$list_etugas_by_master_modul = Tugas::where('nilai_master_modul', $master_modul_id)->where('pegawai', $user['id'])->get();
-		$list_mahasiswa = $nilai_master_modul->toKuliah->toKelas->mahasiswa;
-		foreach ($list_mahasiswa as $mahasiswa) {
+		// $list_mahasiswa = $nilai_master_modul->toKuliah->toKelas->mahasiswa;
+		foreach ($list_nilai_modul as $nilai_modul) {
+			$mahasiswa = Mahasiswa::find($nilai_modul->mahasiswa);
 			$rata = 0;
 			foreach ($list_etugas_by_master_modul as $etugas) {
 				$nilai = NilaiMahasiswa::where('tugas_id', $etugas->id)->where('nrp', $mahasiswa->nrp)->first();
@@ -111,14 +118,15 @@ class ReportController extends Controller {
 				$rata += $nilai;
 			}
 
+			// $nilai_modul = NilaiModul::joinNilaiModulDetail()->where('nilai_modul.mahasiswa', $mahasiswa->nomor)
+			// 	->where('nilai_modul.kuliah', $nilai_master_modul->kuliah)
+			// 	->where('nilai_modul_detil.nilai_master_modul', $nilai_master_modul->nomor)
+			// 	->first();
 			$nilai_modul = NilaiModul::joinNilaiModulDetail()->where('nilai_modul.mahasiswa', $mahasiswa->nomor)
 				->where('nilai_modul.kuliah', $nilai_master_modul->kuliah)
 				->where('nilai_modul_detil.nilai_master_modul', $nilai_master_modul->nomor)
 				->first();
-			$nilai_modul = NilaiModul::joinNilaiModulDetail()->where('nilai_modul.mahasiswa', 2024)
-				->where('nilai_modul.kuliah', $nilai_master_modul->kuliah)
-				->where('nilai_modul_detil.nilai_master_modul', $nilai_master_modul->nomor)
-				->first();
+
 			\Log::info('kuliah .'.$nilai_master_modul->kuliah);
 			\Log::info('$nilai_master_modul ' . $nilai_master_modul->nomor);
 			\Log::info('mahasiswa ' . $mahasiswa->nomor);
@@ -126,8 +134,8 @@ class ReportController extends Controller {
 			if ($nilai_modul) {
 				$nilai_modul_detail = NilaiModulDetail::where('nilai_modul', $nilai_modul->nomor)->where('nilai_master_modul', $nilai_master_modul->nomor)->first();
 				if ($nilai_modul_detail) \Log::info('ok');
-				// $nilai_modul_detail->n = $rata;
-				// $nilai_modul_detail->save();
+				$nilai_modul_detail->n = $rata;
+				$nilai_modul_detail->save();
 			}
 		};
 		

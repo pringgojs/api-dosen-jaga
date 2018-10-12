@@ -32,7 +32,7 @@ Route::group(['prefix' => 'api'], function ()   {
 
 		// etugas
 		Route::post('e-tugas/set-nilai', 'EtugasController@setNilai');
-		Route::post('e-tugas/get-by-kuliah', 'EtugasController@getByKuliah');
+		Route::post('e-tugas/filter', 'EtugasController@filter');
 		Route::post('e-tugas/update/{id}', 'EtugasController@update');
 		Route::post('e-tugas/detail/{id}', 'EtugasController@detail');
 		Route::post('e-tugas/edit/{id}', 'EtugasController@edit');
@@ -62,7 +62,15 @@ Route::group(['prefix' => 'api'], function ()   {
 		Route::post('dashboard', 'DashboardController@index');
 		
 	});
+
+	Route::group(['prefix' => 'filter'], function ()   {
+		Route::post('get-modul', 'FilterController@getModul');
+		Route::post('get-matakuliah', 'FilterController@getMatakuliah');
+		Route::post('get-kelas', 'FilterController@getKelas');
+		Route::get('get-semester', 'FilterController@getSemester');
+	});
 });
+
 
 
 Route::get('/', 'WelcomeController@index');

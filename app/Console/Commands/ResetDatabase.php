@@ -44,8 +44,9 @@ class ResetDatabase extends Command
             $sequence_array = get_object_vars($sequence);
             DB::statement('DROP SEQUENCE '.$this->argument('db_name').'.'.$sequence_array['sequence_name']);
         }
-        $array = array('GENERATIONS', 'CLASS', 'PROGRAMS', 'STUDENTS', 'STUDY_PROGRAMS', 'JURUSAN', 'KELAS', 'MAHASISWA', 'PROGRAM', 
-            'AKUMULASI_IPK_JAM', 'AKUMULASI_IPK_JAM_GROUP', 'FIPK_JAM', 'FJAM_IPK', 'FJAM_IPK_GROUP');
+        
+        $array = array('JURUSAN', 'KELAS', 'KULIAH', 'MAHASISWA', 'MATAKULIAH', 'NILAI_MASTER_MODUL', 'PEGAWAI', 'PROGRAM', 'PROGRAM_STUDY', 
+            'NILAI_MODUL', 'NILAI_MODUL_DETAIL');
         foreach(DB::select('select * from tab') as $table) {
             $table_array = get_object_vars($table);
             if (!in_array($table_array['tname'], $array)) {

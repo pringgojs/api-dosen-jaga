@@ -14,7 +14,7 @@ class EtugasController extends Controller {
 	public function index(Request $request)
 	{
 		$user = $request->input('user');
-
+		$list_semester = Kuliah::semester()->get();
 		$list_tugas = Tugas::joinNilaiMasterModul()
 			->joinDependence($user['id'])
 			->orderBy('kuliah.tahun', 'DESC')
@@ -22,17 +22,11 @@ class EtugasController extends Controller {
 			->orderBy('nilai_master_modul.nomor', 'DESC')
 			->where('nilai_master_modul.pengasuh', $user['id'])
 			->get();
-		$list_semester = Tugas::joinNilaiMasterModul()
-			->joinDependence($user['id'])
-			->orderBy('kuliah.tahun', 'DESC')
-			->orderBy('kuliah.semester', 'DESC')
-			->orderBy('nilai_master_modul.nomor', 'DESC')
-			->get();
+		
 		return response()->json(
 			[
-				'code' => 200,
-				'data' => $list_tugas,
-				'data_semester' => $list_semester,
+				'list_semester' => $list_semester,
+				'list_tugas' => $list_tugas,
 			]
 		);
 	}
@@ -144,34 +138,34 @@ class EtugasController extends Controller {
 		);
 	}
 
-	public function getByKuliah(Request $request)
+	public function filter(Request $request)
 	{
 		$user = $request->input('user');
-		$kuliah = $request->input('kuliah');
+		$request = $request->input('request');
+		$semester = explode('/', $request['semester']);
+		$kelas = $request['kelas'];
+		$matakuliah = $request['matakuliah'];
+		$kuliah = Kuliah::select(['*'])
+			->where('tahun', $semester[0])->where('semester', $semester[1])->where('kelas', $kelas)
+			->where('matakuliah', $matakuliah)
+			->where(function ($q) use ($user) {
+				foreach (Kuliah::listDosen() as $dosen) {
+					$q->orWhere($dosen, $user['id']);
+				}
+			})
+			->first();
+		if (!$kuliah) return [];
+		
 		$list_tugas = Tugas::joinNilaiMasterModul()
 			->joinDependence($user['id'])
-			->where('nilai_master_modul.kuliah', $kuliah)
+			->where('nilai_master_modul.kuliah', $kuliah->nomor)
 			->orderBy('kuliah.tahun', 'DESC')
 			->orderBy('kuliah.semester', 'DESC')
 			->orderBy('nilai_master_modul.nomor', 'DESC')
 			->where('nilai_master_modul.pengasuh', $user['id'])
 			->get();
-			
-		$list_semester = Tugas::joinNilaiMasterModul()
-			->joinDependence($user['id'])
-			->where('nilai_master_modul.kuliah', $kuliah)
-			->orderBy('kuliah.tahun', 'DESC')
-			->orderBy('kuliah.semester', 'DESC')
-			->orderBy('nilai_master_modul.nomor', 'DESC')
-			->get();
 
-		return response()->json(
-			[
-				'code' => 200,
-				'data' => $list_tugas,
-				'data_semester' => $list_semester,
-			]
-		);
+		return $list_tugas;
 	}
 
 	public function detail(Request $request, $id)
