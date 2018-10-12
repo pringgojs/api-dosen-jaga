@@ -12,9 +12,11 @@ class AddColumnLastSaveNilaiMasterModulTable extends Migration {
 	 */
 	public function up()
     {
-        Schema::table('nilai_master_modul', function($table) {
-            $table->timestamp('last_save')->nullable();
-        });
+        if (!Schema::hasColumn('nilai_master_modul', 'last_save')) {
+            Schema::table('nilai_master_modul', function($table) {
+                $table->timestamp('last_save')->nullable();
+            });
+        }
     }
 
     /**
