@@ -17,24 +17,11 @@ class ReportController extends Controller {
 	public function nilaiPermodul(Request $request)
 	{
 		$user = $request->input('user');
-		$list_semester = Tugas::joinNilaiMasterModul()
-			->joinDependence($user['id'])
-			->orderBy('kuliah.tahun', 'DESC')
-			->orderBy('kuliah.semester', 'DESC')
-			->orderBy('nilai_master_modul.nomor', 'DESC')
-			->get();
-		return response()->json(
-			[
-				'code' => 200,
-				'data_semester' => $list_semester,
-			]
-		);
-	}
-	
-	public function kuliah(Request $request)
-	{
 		$user = $request->input('user');
-		$kuliah = $request->input('kuliah');
+		$list_semester = Kuliah::semester()->get();
+		$kuliah = Tugas::where('pegawai', $user['id'])->orderBy('kuliah', 'DESC')->groupBy('kuliah')->max('kuliah');
+		if (!$kuliah) return [];
+		
 		$list_tugas = Tugas::joinNilaiMasterModul()
 			->joinDependence($user['id'])
 			->where('nilai_master_modul.kuliah', $kuliah)
@@ -48,12 +35,49 @@ class ReportController extends Controller {
 			$item['total_tugas'] = Tugas::where('nilai_master_modul', $item->nomor_nilai_master_modul)->where('kuliah', $kuliah)->where('pegawai', $user['id'])->count();
 			return $item;
 		});
+		
 		return response()->json(
 			[
-				'code' => 200,
-				'data' => $list_tugas,
+				'list_semester' => $list_semester,
+				'list_tugas' => $list_tugas,
 			]
 		);
+	}
+	
+	public function filter(Request $request)
+	{
+		$user = $request->input('user');
+		$request = $request->input('request');
+		$semester = explode('/', $request['semester']);
+		$kelas = $request['kelas'];
+		$matakuliah = $request['matakuliah'];
+		$kuliah = Kuliah::select(['*'])
+			->where('tahun', $semester[0])->where('semester', $semester[1])->where('kelas', $kelas)
+			->where('matakuliah', $matakuliah)
+			->where(function ($q) use ($user) {
+				foreach (Kuliah::listDosen() as $dosen) {
+					$q->orWhere($dosen, $user['id']);
+				}
+			})
+			->first();
+		if (!$kuliah) return [];
+
+		$list_tugas = Tugas::joinNilaiMasterModul()
+			->joinDependence($user['id'])
+			->where('nilai_master_modul.kuliah', $kuliah->nomor)
+			->orderBy('kuliah.tahun', 'DESC')
+			->orderBy('kuliah.semester', 'DESC')
+			->orderBy('nilai_master_modul.nomor', 'DESC')
+			->where('nilai_master_modul.pengasuh', $user['id'])
+			->groupBy('nilai_master_modul.nomor')
+			->get();
+
+		$list_tugas = $list_tugas->map(function ($item) use($kuliah, $user ){
+			$item['total_tugas'] = Tugas::where('nilai_master_modul', $item->nomor_nilai_master_modul)->where('kuliah', $kuliah->nomor)->where('pegawai', $user['id'])->count();
+			return $item;
+		});
+		
+		return $list_tugas;
 	}
 
 	public function detail(Request $request)
@@ -68,8 +92,7 @@ class ReportController extends Controller {
 			array_push($table_headers, 'Tugas '.++$row);
 		}
 		array_push($table_headers, 'Rata-rata');
-
-		$list_mahasiswa = $nilai_master_modul->toKuliah->toKelas->mahasiswa;
+		$list_mahasiswa = NilaiModul::joinMahasiswa()->where('kuliah', $nilai_master_modul->kuliah)->get();
 		
 		$kelas_mahasiswa = $list_mahasiswa->map(function ($item) use ($list_etugas_by_master_modul) {
 			$rata = 0;

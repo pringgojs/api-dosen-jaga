@@ -13,4 +13,9 @@ class NilaiModul extends Model
     {
         $q->join('nilai_modul_detil', 'nilai_modul_detil.nilai_modul', '=', 'nilai_modul.nomor');
 	}
+
+	public function scopeJoinMahasiswa($q)
+    {
+        $q->join('mahasiswa', 'mahasiswa.nomor', '=', 'nilai_modul.mahasiswa');
+	}
 }

@@ -21,7 +21,7 @@ Route::group(['prefix' => 'api'], function ()   {
 		// Report
 		Route::post('report/nilai-permodul/sync', 'ReportController@sync');
 		Route::post('report/nilai-permodul/detail', 'ReportController@detail');
-		Route::post('report/nilai-permodul/kuliah', 'ReportController@kuliah');
+		Route::post('report/nilai-permodul/filter', 'ReportController@filter');
 		Route::post('report/nilai-permodul', 'ReportController@nilaiPermodul');
 
 		// materi
@@ -56,7 +56,7 @@ Route::group(['prefix' => 'api'], function ()   {
 		Route::post('materi', 'MateriController@index');
 
 		// etugas
-		Route::post('etugas/kuliah/{id}', 'EtugasController@kuliah');
+		Route::post('etugas/filter', 'EtugasController@filter');
 		Route::post('etugas/store', 'EtugasController@store');
 		Route::post('etugas/detail/{id}', 'EtugasController@detail');
 		Route::post('etugas', 'EtugasController@index');

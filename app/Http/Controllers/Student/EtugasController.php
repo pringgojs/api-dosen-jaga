@@ -5,6 +5,7 @@ use App\Models\Tugas;
 use App\Http\Requests;
 use App\Models\Kuliah;
 use App\Models\Mahasiswa;
+use App\Models\NilaiModul;
 use Illuminate\Http\Request;
 use App\Models\NilaiMahasiswa;
 use App\Models\NilaiMasterModul;
@@ -17,38 +18,50 @@ class EtugasController extends Controller {
 	{
 		$user = $request->input('user');
 		$student = Mahasiswa::find($user['id']);
-		$list_semester = Tugas::getDataByKuliah($student->kelas)->get();
-		$list_tugas = Tugas::getDataTugas($student->kelas)->get();
-		\Log::info($list_tugas);
-
+		$list_semester = Kuliah::semester()->get();
+		$kuliah = NilaiModul::where('mahasiswa', $student->nomor)->max('kuliah');
+		$kuliah = Kuliah::find($kuliah);
+		$list_tugas = Tugas::getDataTugas($kuliah->kelas, $kuliah->nomor)->get();
 		$list_tugas = $list_tugas->map(function ($item) use($user) {
 			$item['nilai_mahasiswa'] = NilaiMahasiswa::where('tugas_id', $item->id)->where('nrp', $user['username'])->first() ? : null;
     		return $item;
 		});
 		return response()->json(
 			[
-				'data' => $list_tugas,
-				'data_semester' => $list_semester,
+				'list_tugas' => $list_tugas,
+				'list_semester' => $list_semester,
 			]
 		);
 	}
 
-	public function kuliah(Request $request, $kuliah)
+	public function filter(Request $request)
 	{
 		$user = $request->input('user');
 		$student = Mahasiswa::find($user['id']);
-		$list_semester = Tugas::getDataByKuliah($student->kelas)->get();
-		$list_tugas = Tugas::getDataTugas($student->kelas, $kuliah)->get();
+		
+		$user = $request->input('user');
+		$request = $request->input('request');
+		$semester = explode('/', $request['semester']);
+		$kelas = $request['kelas'];
+		$matakuliah = $request['matakuliah'];
+		$kuliah = Kuliah::select(['*'])
+			->where('tahun', $semester[0])->where('semester', $semester[1])->where('kelas', $kelas)
+			->where('matakuliah', $matakuliah)
+			->where(function ($q) use ($user) {
+				foreach (Kuliah::listDosen() as $dosen) {
+					$q->orWhere($dosen, $user['id']);
+				}
+			})
+			->first();
+		if (!$kuliah) return [];
+
+		$list_tugas = Tugas::getDataTugas($kuliah->kelas, $kuliah->nomor)->get();
 		$list_tugas = $list_tugas->map(function ($item) use($user) {
 			$item['nilai_mahasiswa'] = NilaiMahasiswa::where('tugas_id', $item->id)->where('nrp', $user['username'])->first() ? : null;
     		return $item;
 		});
-		return response()->json(
-			[
-				'data' => $list_tugas,
-				'data_semester' => $list_semester,
-			]
-		);
+		
+		return $list_tugas;
 	}
 
 	public function detail(Request $request, $id)
