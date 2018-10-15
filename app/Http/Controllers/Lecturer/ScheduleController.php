@@ -30,7 +30,6 @@ class ScheduleController extends Controller {
 	{
 		$user = $request->input('user');
 		$request = $request->input('request');
-		\Log::info($request);
 		$semester = explode('/', $request['semester']);
 		$kelas = $request['kelas'];
 		$matakuliah = $request['matakuliah'];
