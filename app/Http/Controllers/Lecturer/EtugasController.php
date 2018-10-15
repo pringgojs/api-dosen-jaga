@@ -67,24 +67,21 @@ class EtugasController extends Controller {
 	public function edit(Request $request, $id)
 	{
 		$user = $request->input('user');
-		$last_kuliah_user = NilaiMasterModul::where('nilai_master_modul.pengasuh', $user['id'])->max('nilai_master_modul.kuliah');
-		$last_kuliah = Kuliah::max('nomor');
-		$kuliah = Kuliah::find($last_kuliah_user);
-		$list_semester = NilaiMasterModul::joinDependence($user['id'])
-			->where('matakuliah.masuk_penilaian', 2)
-			->groupBy('nilai_master_modul.kuliah')
-			->orderBy('kuliah.tahun', 'DESC')
-			->orderBy('kuliah.semester', 'DESC')
-			->orderBy('nilai_master_modul.nomor', 'DESC')
-			->get();
+		
 		$tugas = Tugas::find($id);
-		$data =  NilaiMasterModul::getDataBySemester($user['id'], $tugas->kuliah)->get();
+		$list_semester = Kuliah::semester()->get();
+		$list_kelas = Kuliah::joinKelas()->select(['kelas.*'])->where('kuliah.tahun', $tugas->toKuliah->tahun)->where('kuliah.semester', $tugas->toKuliah->semester)->groupBy('kuliah.kelas')->get();
+		$list_matakuliah = Kuliah::joinMatakuliah()->select(['matakuliah.*'])->where('kuliah.tahun', $tugas->toKuliah->tahun)->where('kuliah.semester', $tugas->toKuliah->semester)->where('kuliah.kelas', $tugas->toKuliah->kelas)->groupBy('kuliah.matakuliah')->get();
+		$list_modul = NilaiMasterModul::where('kuliah', $tugas->kuliah)->where('pengasuh', $tugas->pegawai)->get();
+		$data =  NilaiMasterModul::getDataBySemester($user['id'], $tugas->toKuliah)->get();
 		return response()->json(
 			[
-				'data_modul' => $data,
-				'tugas' => $tugas,
-				'data_semester' => $list_semester,
-				'keterangan' => $last_kuliah == $last_kuliah_user ? 'saat ini' : 'semester lalu',
+				'list_semester' => $list_semester,
+				'list_kelas' => $list_kelas,
+				'list_matakuliah' => $list_matakuliah,
+				'list_modul' => $list_modul,
+				'kuliah' =>  $tugas->toKuliah,
+				'tugas' =>  $tugas,
 			]
 		);
 	}

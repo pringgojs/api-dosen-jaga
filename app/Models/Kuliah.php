@@ -19,6 +19,11 @@ class Kuliah extends Model
         $q->select(\DB::raw("CONCAT(tahun,'/',semester ) AS semester"))->groupBy('tahun')->groupBy('semester')->orderBy('semester', 'DESC');
 	}
 
+	public function scopeMatakuliah($q)
+    {
+        $q->select(\DB::raw("CONCAT(tahun,'/',semester ) AS semester"))->groupBy('tahun')->groupBy('semester')->orderBy('semester', 'DESC');
+	}
+
 	public function mataKuliah()
     {
         return $this->belongsTo('App\Models\MataKuliah', 'matakuliah');
