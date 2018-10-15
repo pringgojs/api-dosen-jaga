@@ -32,6 +32,11 @@ class CreateEtugasMateriTable extends Migration {
                 ->references('id')->on('kuliah')
                 ->onUpdate('cascade')
 				->onDelete('cascade');
+			$table->integer('pegawai')->unsigned()->index('materi_dosen_index')->nullable();
+            $table->foreign('pegawai', 'materi_dosen_foreign')
+                ->references('id')->on('pegawai')
+                ->onUpdate('cascade')
+				->onDelete('cascade');
             $table->string('file_url')->nullable();
             $table->string('file_type')->nullable();
 			$table->string('file_size')->nullable();

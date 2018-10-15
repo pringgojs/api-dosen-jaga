@@ -25,7 +25,9 @@ Route::group(['prefix' => 'api'], function ()   {
 		Route::post('report/nilai-permodul', 'ReportController@nilaiPermodul');
 
 		// materi
-		Route::post('materi/get-by-kuliah', 'MateriController@getByKuliah');
+		Route::post('materi/update/{id}', 'MateriController@update');
+		Route::post('materi/edit/{id}', 'MateriController@edit');
+		Route::post('materi/filter', 'MateriController@filter');
 		Route::post('materi/delete/{id}', 'MateriController@delete');
 		Route::post('materi/store', 'MateriController@store');
 		Route::post('materi', 'MateriController@index');
