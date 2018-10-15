@@ -15,7 +15,7 @@ Route::group(['prefix' => 'api'], function ()   {
 	
 	// lecturer
 	Route::group(['prefix' => 'lecturer', 'namespace' => 'Lecturer'], function ()   {
-		Route::post('schedule/get-by-semester/{kuliah}', 'ScheduleController@getBySemester');
+		Route::post('schedule/filter', 'ScheduleController@filter');
 		Route::post('schedule', 'ScheduleController@index');
 		
 		// Report
