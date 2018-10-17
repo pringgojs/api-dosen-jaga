@@ -90,24 +90,24 @@ class EtugasController extends Controller {
 		$request = $request->input('request');
 
 		DB::beginTransaction();
-		$etugas_find = NilaiMahasiswa::where('tugas_id', $request['tugas_id'])->where('nrp', $user['username'])->first();
-		$tugas = $etugas_find ?  :  new NilaiMahasiswa;
-		$tugas->nrp = $user['username'];
-		$tugas->keterangan = $request['keterangan'];
-		$tugas->tugas_id = $request['tugas_id'];
-		$tugas->kelas = $request['kelas_id'];
+		$nilai_mahasiswa = NilaiMahasiswa::where('tugas_id', $request['tugas_id'])->where('nrp', $user['username'])->first();
+		$nilai_mahasiswa = $nilai_mahasiswa ?  :  new NilaiMahasiswa;
+		$nilai_mahasiswa->nrp = $user['username'];
+		$nilai_mahasiswa->keterangan = $request['keterangan'];
+		$nilai_mahasiswa->tugas_id = $request['tugas_id'];
+		$nilai_mahasiswa->kelas = $request['kelas_id'];
 		if ($file) {
-			$tugas->file_url = $file ? $file['original_path'] : null;
-			$tugas->file_size = $file ? $file['original_size'] : null;
-			$tugas->file_type = $file ? $file['original_extension'] : null;
+			$nilai_mahasiswa->file_url = $file ? $file['original_path'] : null;
+			$nilai_mahasiswa->file_size = $file ? $file['original_size'] : null;
+			$nilai_mahasiswa->file_type = $file ? $file['original_extension'] : null;
 		}
-		$tugas->created_at = Carbon::now();
-		$tugas->updated_at = Carbon::now();
-		$tugas->save();
+		$nilai_mahasiswa->created_at = Carbon::now();
+		$nilai_mahasiswa->updated_at = Carbon::now();
+		$nilai_mahasiswa->save();
 		DB::commit();
-
-		$student = Mahasiswa::find($user['id']);
-		$list_tugas = Tugas::getDataTugas($student->kelas)->get();
+		
+		$tugas = Tugas::find($request['tugas_id']);
+		$list_tugas = Tugas::getDataTugas($tugas->toKuliah->kelas, $tugas->toKuliah->nomor)->get();
 		$list_tugas = $list_tugas->map(function ($item) use($user) {
 			$item['nilai_mahasiswa'] = NilaiMahasiswa::where('tugas_id', $item->id)->where('nrp', $user['username'])->first() ? : null;
     		return $item;
@@ -115,9 +115,7 @@ class EtugasController extends Controller {
 
 		return response()->json(
 			[
-				'code' => 200,
-				'status' => 'Data saved',
-				'data_tugas' => $list_tugas
+				'list_tugas' => $list_tugas
 			]
 		);
 	}
