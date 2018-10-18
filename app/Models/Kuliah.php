@@ -48,4 +48,9 @@ class Kuliah extends Model
     {
         $q->join('etugas_materi', 'etugas_materi.kuliah', '=', 'kuliah.nomor');
 	}
+
+	public function scopeJoinTugas($q)
+    {
+        $q->join('etugas_tugas', 'etugas_tugas.kuliah', '=', 'kuliah.nomor');
+	}
 }

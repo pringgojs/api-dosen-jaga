@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers\Student;
 
 use Carbon\Carbon;
+use App\Models\Nilai;
 use App\Models\Tugas;
 use App\Http\Requests;
 use App\Models\Kuliah;
@@ -18,9 +19,8 @@ class EtugasController extends Controller {
 	{
 		$user = $request->input('user');
 		$student = Mahasiswa::find($user['id']);
-		$list_semester = Kuliah::semester()->get();
-		$kuliah = NilaiModul::where('mahasiswa', $student->nomor)->max('kuliah');
-		$kuliah = Kuliah::find($kuliah);
+		$list_semester = Nilai::joinKuliah()->joinTugas()->semester()->where('nilai.mahasiswa', $student->nomor)->get();
+		$kuliah = Nilai::joinKuliah()->joinTugas()->select(['kuliah.*'])->where('nilai.mahasiswa', $student->nomor)->groupBy('kuliah.nomor')->first();
 		$list_tugas = Tugas::getDataTugas($kuliah->kelas, $kuliah->nomor)->get();
 		$list_tugas = $list_tugas->map(function ($item) use($user) {
 			$item['nilai_mahasiswa'] = NilaiMahasiswa::where('tugas_id', $item->id)->where('nrp', $user['username'])->first() ? : null;
@@ -37,22 +37,16 @@ class EtugasController extends Controller {
 	public function filter(Request $request)
 	{
 		$user = $request->input('user');
-		$student = Mahasiswa::find($user['id']);
-		
-		$user = $request->input('user');
 		$request = $request->input('request');
 		$semester = explode('/', $request['semester']);
 		$kelas = $request['kelas'];
 		$matakuliah = $request['matakuliah'];
-		$kuliah = Kuliah::select(['*'])
-			->where('tahun', $semester[0])->where('semester', $semester[1])->where('kelas', $kelas)
-			->where('matakuliah', $matakuliah)
-			->where(function ($q) use ($user) {
-				foreach (Kuliah::listDosen() as $dosen) {
-					$q->orWhere($dosen, $user['id']);
-				}
-			})
+		$student = Mahasiswa::find($user['id']);
+		$kuliah = Kuliah::joinTugas()->select(['kuliah.*'])
+			->where('kuliah.tahun', $semester[0])->where('kuliah.semester', $semester[1])->where('kuliah.kelas', $kelas)
+			->where('kuliah.matakuliah', $matakuliah)
 			->first();
+		
 		if (!$kuliah) return [];
 
 		$list_tugas = Tugas::getDataTugas($kuliah->kelas, $kuliah->nomor)->get();

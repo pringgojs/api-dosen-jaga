@@ -19,7 +19,7 @@ class MateriController extends Controller {
 		/**
 		 * Filter
 		 * 1. Tampilkan semua semester yang ada ditable kuliah, materi, nilai
-		 * 2. Tampilkan
+		 * 2. Tampilkan semua table materi yang sesuai kelas dia sebelumnya
 		 */
 		$user = $request->input('user');
 		$student = Mahasiswa::find($user['id']);
