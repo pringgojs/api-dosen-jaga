@@ -43,4 +43,9 @@ class Kuliah extends Model
     {
         $q->join('matakuliah', 'matakuliah.nomor', '=', 'kuliah.matakuliah');
 	}
+
+	public function scopeJoinMateri($q)
+    {
+        $q->join('etugas_materi', 'etugas_materi.kuliah', '=', 'kuliah.nomor');
+	}
 }

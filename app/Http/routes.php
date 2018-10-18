@@ -52,7 +52,7 @@ Route::group(['prefix' => 'api'], function ()   {
 		Route::post('schedule', 'ScheduleController@index');
 		
 		// materi
-		Route::post('materi/kuliah/{id}', 'MateriController@kuliah');
+		Route::post('materi/filter', 'MateriController@filter');
 		Route::post('materi', 'MateriController@index');
 
 		// etugas
@@ -66,10 +66,19 @@ Route::group(['prefix' => 'api'], function ()   {
 	});
 
 	Route::group(['prefix' => 'filter'], function ()   {
-		Route::post('get-modul', 'FilterController@getModul');
-		Route::post('get-matakuliah', 'FilterController@getMatakuliah');
-		Route::post('get-kelas', 'FilterController@getKelas');
-		Route::get('get-semester', 'FilterController@getSemester');
+		Route::group(['prefix' => 'lecturer', 'namespace' => 'Lecturer'], function ()   {
+			Route::post('get-modul', 'FilterController@getModul');
+			Route::post('get-matakuliah', 'FilterController@getMatakuliah');
+			Route::post('get-kelas', 'FilterController@getKelas');
+			Route::get('get-semester', 'FilterController@getSemester');
+		});
+
+		Route::group(['prefix' => 'student', 'namespace' => 'Student'], function ()   {
+			Route::post('get-modul', 'FilterController@getModul');
+			Route::post('get-matakuliah', 'FilterController@getMatakuliah');
+			Route::post('get-kelas', 'FilterController@getKelas');
+			Route::get('get-semester/{type}', 'FilterController@getSemester');
+		});
 	});
 });
 

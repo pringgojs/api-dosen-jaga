@@ -82,6 +82,11 @@ class Materi extends Model
         $q->join('mahasiswa', 'mahasiswa.kelas', '=', 'kuliah.kelas');
 	}
 
+	public function scopeJoinNilai($q)
+    {
+        $q->join('nilai', 'nilai.kuliah', '=', 'materi.kuliah');
+	}
+
 	public function scopeGetDataByKuliah($q, $kelas)
 	{
 		$q->joinNilaiMasterModul()
@@ -106,12 +111,42 @@ class Materi extends Model
 			->joinProgram()
 			->joinMatakuliah()
 			->where('etugas_materi.kelas', $kelas)
-			->whereRaw('kuliah.tahun = (SELECT max(tahun) from kuliah where kelas = '.$kelas.') and kuliah.semester = (SELECT max(semester) from kuliah where kelas = '.$kelas.')')
+			// ->whereRaw('kuliah.tahun = (SELECT max(tahun) from kuliah where kelas = '.$kelas.') and kuliah.semester = (SELECT max(semester) from kuliah where kelas = '.$kelas.')')
 			->where(function($query) use ($kuliah) {
 				if ($kuliah) {
 					$query->where('etugas_materi.kuliah', $kuliah);
 				}
 			})
+			->select([
+				'kuliah.tahun',
+				'kuliah.semester',
+				'kelas.pararel',
+				'kelas.kelas',
+				'program.program',
+				'etugas_materi.judul',
+				'etugas_materi.keterangan',
+				'etugas_materi.file_url',
+				'jurusan.jurusan',
+				'matakuliah.matakuliah',
+				'nilai_master_modul.kuliah',
+				'nilai_master_modul.modul',
+				'nilai_master_modul.nomor as nomor_nilai_master_modul'
+			])
+			->orderBy('kuliah.tahun', 'DESC')
+			->orderBy('kuliah.semester', 'DESC')
+			->orderBy('nilai_master_modul.nomor', 'DESC');
+	}
+
+	public function scopeGetListMateri($q, $kuliah)
+	{
+		$q->joinNilaiMasterModul()
+			->joinKuliah()
+			->joinKelas()
+			->joinJurusan()
+			->joinProgram()
+			->joinMatakuliah()
+			// ->whereRaw('kuliah.tahun = (SELECT max(tahun) from kuliah where kelas = '.$kelas.') and kuliah.semester = (SELECT max(semester) from kuliah where kelas = '.$kelas.')')
+			->where('etugas_materi.kuliah', $kuliah)
 			->select([
 				'kuliah.tahun',
 				'kuliah.semester',
