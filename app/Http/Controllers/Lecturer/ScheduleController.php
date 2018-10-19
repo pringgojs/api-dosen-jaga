@@ -16,8 +16,22 @@ class ScheduleController extends Controller {
 	{
 		$user = $request->input('user');
 		$list_semester = Kuliah::semester()->get();
-		$last_kuliah_user = NilaiMasterModul::where('pengasuh', $user['id'])->orderBy('kuliah', 'DESC')->groupBy('kuliah')->first();
-		$list_schedule =  NilaiMasterModul::getDataBySemester($user['id'], $last_kuliah_user->kuliah)->get();
+		$single_kuliah = NilaiMasterModul::where('pengasuh', $user['id'])->orderBy('kuliah', 'DESC')->select('kuliah')->groupBy('kuliah')->first();
+		$kuliah = Kuliah::find($single_kuliah->kuliah);
+		
+		if (!$kuliah) {
+			return response()->json([
+					'list_schedule' => $list_schedule,
+					'list_semester' => [],
+			]);
+		}
+
+		$last_kuliah_user = NilaiMasterModul::where('pengasuh', $user['id'])->orderBy('kuliah', 'DESC')->select('kuliah')->groupBy('kuliah')->take(20)->get()->toArray();
+		$list_schedule =  NilaiMasterModul::getDataByKuliahArray($user['id'], $last_kuliah_user)
+			->where('kuliah.tahun', $kuliah->tahun)
+			->where('kuliah.semester', $kuliah->semester)
+			->get();
+
 		return response()->json(
 			[
 				'list_schedule' => $list_schedule,

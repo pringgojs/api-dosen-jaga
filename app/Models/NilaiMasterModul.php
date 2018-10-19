@@ -75,6 +75,15 @@ class NilaiMasterModul extends Model
 			->orderBy('kuliah.tahun', 'DESC')
 			->orderBy('kuliah.semester', 'DESC')
 			->orderBy('nilai_master_modul.nomor', 'DESC');
+	}
+	
+	public function scopeGetDataByKuliahArray($q, $dosen_id, $arr_kuliah)
+    {
+        $q->joinDependence($dosen_id)
+			->whereIn('nilai_master_modul.kuliah', $arr_kuliah)
+			->orderBy('kuliah.tahun', 'DESC')
+			->orderBy('kuliah.semester', 'DESC')
+			->orderBy('nilai_master_modul.nomor', 'DESC');
     }
 
 }
