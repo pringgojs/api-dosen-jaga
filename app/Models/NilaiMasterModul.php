@@ -7,7 +7,7 @@ class NilaiMasterModul extends Model
 {
 	protected $table = 'nilai_master_modul';   
 	protected $primaryKey = 'nomor';
-	public $timestamps = true;
+	public $timestamps = false;
 
 	public function pegawai()
     {

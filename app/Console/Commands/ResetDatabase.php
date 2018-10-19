@@ -46,7 +46,7 @@ class ResetDatabase extends Command
         }
         
         $array = array('JURUSAN', 'KELAS', 'KULIAH', 'MAHASISWA', 'MATAKULIAH', 'NILAI_MASTER_MODUL', 'PEGAWAI', 'PROGRAM', 'PROGRAM_STUDY', 
-            'NILAI_MODUL', 'NILAI_MODUL_DETAIL');
+            'NILAI_MODUL', 'NILAI_MODUL_DETIL');
         foreach(DB::select('select * from tab') as $table) {
             $table_array = get_object_vars($table);
             if (!in_array($table_array['tname'], $array)) {

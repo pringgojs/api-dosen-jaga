@@ -3,6 +3,7 @@
 use App\Models\Tugas;
 use App\Http\Requests;
 use App\Models\Kuliah;
+use App\Models\NilaiModul;
 use Illuminate\Http\Request;
 use App\Models\NilaiMahasiswa;
 use App\Models\NilaiMasterModul;
@@ -169,7 +170,8 @@ class EtugasController extends Controller {
 	{
 		$user = $request->input('user');
 		$etugas = Tugas::find($id);
-		$kelas_mahasiswa = $etugas->toKelas->mahasiswa->map(function ($item) use ($etugas) {
+		$list_mahasiswa = NilaiModul::joinMahasiswa()->where('nilai_modul.kuliah', $etugas->kuliah)->select('nilai_modul.mahasiswa')->select(['mahasiswa.*'])->get();
+		$kelas_mahasiswa = $list_mahasiswa->map(function ($item) use ($etugas) {
 			$item['nilai'] = NilaiMahasiswa::where('tugas_id', $etugas->id)->where('nrp', $item['nrp'])->first();
 			return $item;
 		});
@@ -201,7 +203,8 @@ class EtugasController extends Controller {
 
 		DB::commit();
 		$tugas = $nilai_mahasiswa->tugas;
-		$kelas_mahasiswa = $tugas->toKelas->mahasiswa->map(function ($item) use ($tugas) {
+		$list_mahasiswa = NilaiModul::joinMahasiswa()->where('nilai_modul.kuliah', $tugas->kuliah)->select('nilai_modul.mahasiswa')->select(['mahasiswa.*'])->get();
+		$kelas_mahasiswa = $list_mahasiswa->map(function ($item) use ($tugas) {
 			$item['nilai'] = NilaiMahasiswa::where('tugas_id', $tugas->id)->where('nrp', $item['nrp'])->first();
 			return $item;
 		});

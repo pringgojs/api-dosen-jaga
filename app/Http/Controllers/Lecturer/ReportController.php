@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers\Lecturer;
 
+use Carbon\Carbon;
 use App\Models\Tugas;
 use App\Http\Requests;
 use App\Models\Kuliah;
@@ -92,8 +93,8 @@ class ReportController extends Controller {
 			array_push($table_headers, 'Tugas '.++$row);
 		}
 		array_push($table_headers, 'Rata-rata');
-		$list_mahasiswa = NilaiModul::joinMahasiswa()->where('kuliah', $nilai_master_modul->kuliah)->get();
 		
+		$list_mahasiswa = NilaiModul::joinMahasiswa()->where('nilai_modul.kuliah', $nilai_master_modul->kuliah)->select('nilai_modul.mahasiswa')->select(['mahasiswa.*'])->get();
 		$kelas_mahasiswa = $list_mahasiswa->map(function ($item) use ($list_etugas_by_master_modul) {
 			$rata = 0;
 			foreach ($list_etugas_by_master_modul as $row => $etugas) {
@@ -102,7 +103,7 @@ class ReportController extends Controller {
 				$rata += $nilai ? $nilai->nilai : 0;
 			}
 
-			$item['rata_rata'] = $rata/$list_etugas_by_master_modul->count();
+			$item['rata_rata'] = $rata / $list_etugas_by_master_modul->count();
 			return $item;
 		});
 		
@@ -120,52 +121,64 @@ class ReportController extends Controller {
 
 	public function sync(Request $request)
 	{
-		\Log::info('log');
-
 		$user = $request->input('user');
 		$master_modul_id = $request->input('id_modul');
-		
-		$table_headers = ['NIM', 'Nama'];
+
 		$nilai_master_modul = NilaiMasterModul::find($master_modul_id);
 		$list_nilai_modul = NilaiModul::where('kuliah', $nilai_master_modul->kuliah)->get();
-		\Log::info('kuliha ' . $nilai_master_modul->kuliah);
-		\Log::info($list_nilai_modul);
 		$list_etugas_by_master_modul = Tugas::where('nilai_master_modul', $master_modul_id)->where('pegawai', $user['id'])->get();
-		// $list_mahasiswa = $nilai_master_modul->toKuliah->toKelas->mahasiswa;
+		
+		// header table response
+		$table_headers = ['NIM', 'Nama'];
+		foreach ($list_etugas_by_master_modul as $row =>  $etugas) {
+			array_push($table_headers, 'Tugas '.++$row);
+		}
+		array_push($table_headers, 'Rata-rata');
+
+
+		// insert nilai to nilai_modul_detil
 		foreach ($list_nilai_modul as $nilai_modul) {
 			$mahasiswa = Mahasiswa::find($nilai_modul->mahasiswa);
 			$rata = 0;
+
 			foreach ($list_etugas_by_master_modul as $etugas) {
 				$nilai = NilaiMahasiswa::where('tugas_id', $etugas->id)->where('nrp', $mahasiswa->nrp)->first();
 				$nilai = $nilai ? $nilai->nilai : 0 ;
 				$rata += $nilai;
 			}
 
-			// $nilai_modul = NilaiModul::joinNilaiModulDetail()->where('nilai_modul.mahasiswa', $mahasiswa->nomor)
-			// 	->where('nilai_modul.kuliah', $nilai_master_modul->kuliah)
-			// 	->where('nilai_modul_detil.nilai_master_modul', $nilai_master_modul->nomor)
-			// 	->first();
-			$nilai_modul = NilaiModul::joinNilaiModulDetail()->where('nilai_modul.mahasiswa', $mahasiswa->nomor)
-				->where('nilai_modul.kuliah', $nilai_master_modul->kuliah)
-				->where('nilai_modul_detil.nilai_master_modul', $nilai_master_modul->nomor)
-				->first();
-
-			\Log::info('kuliah .'.$nilai_master_modul->kuliah);
-			\Log::info('$nilai_master_modul ' . $nilai_master_modul->nomor);
-			\Log::info('mahasiswa ' . $mahasiswa->nomor);
-			\Log::info($nilai_modul);
-			if ($nilai_modul) {
-				$nilai_modul_detail = NilaiModulDetail::where('nilai_modul', $nilai_modul->nomor)->where('nilai_master_modul', $nilai_master_modul->nomor)->first();
-				if ($nilai_modul_detail) \Log::info('ok');
+			$nilai_modul_detail = NilaiModulDetail::where('nilai_modul', $nilai_modul->nomor)->where('nilai_master_modul', $nilai_master_modul->nomor)->first();
+			if ($nilai_modul_detail) {
 				$nilai_modul_detail->n = $rata;
 				$nilai_modul_detail->save();
 			}
+
 		};
 		
-		return response()->json(
-			[
-				'status' => 'ok'
-			]
-		);
+		// update last save in nilai master modul
+		$nilai_master_modul->last_save = Carbon::now()->toDateTimeString();
+		$nilai_master_modul->save();
+
+		// data table for response
+		$list_mahasiswa = NilaiModul::joinMahasiswa()->where('nilai_modul.kuliah', $nilai_master_modul->kuliah)->select('nilai_modul.mahasiswa')->select(['mahasiswa.*'])->get();
+		$kelas_mahasiswa = $list_mahasiswa->map(function ($item) use ($list_etugas_by_master_modul) {
+			$rata = 0;
+			foreach ($list_etugas_by_master_modul as $row => $etugas) {
+				$nilai = NilaiMahasiswa::where('tugas_id', $etugas->id)->where('nrp', $item->nrp)->first();
+				$item['tugas_'.++$row] =  $nilai ? $nilai->nilai : 0 ;
+				$rata += $nilai ? $nilai->nilai : 0;
+			}
+
+			$item['rata_rata'] = $rata / $list_etugas_by_master_modul->count();
+			return $item;
+		});
+
+		return response()->json([
+				'table_headers' => $table_headers,
+				'nilai_master_modul' => $nilai_master_modul,
+				'list_etugas_by_master_modul' => $list_etugas_by_master_modul,
+				'kelas_mahasiswa' => $kelas_mahasiswa,
+				'mata_kuliah' => $nilai_master_modul->toKuliah->mataKuliah
+		]);
 	}
 }
