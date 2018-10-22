@@ -18,22 +18,22 @@ class CreateEtugasTugasTable extends Migration {
 			$table->text('keterangan')->nullable();
             $table->integer('nilai_master_modul')->unsigned()->index('et_tugas_index')->nullable();
             $table->foreign('nilai_master_modul', 'et_tugas_foreign')
-                ->references('id')->on('nilai_master_modul')
+                ->references('nomor')->on('nilai_master_modul')
                 ->onUpdate('cascade')
 				->onDelete('cascade');
 			$table->integer('kelas')->unsigned()->index('etugas_tkelas_index')->nullable();
             $table->foreign('kelas', 'etugas_tkelas_foreign')
-                ->references('id')->on('kelas')
+                ->references('nomor')->on('kelas')
                 ->onUpdate('cascade')
 				->onDelete('cascade');
 			$table->integer('kuliah')->unsigned()->index('etugas_tkuliah_index')->nullable();
             $table->foreign('kuliah', 'etugas_tkuliah_foreign')
-                ->references('id')->on('kuliah')
+                ->references('nomor')->on('kuliah')
                 ->onUpdate('cascade')
 				->onDelete('cascade');
 			$table->integer('pegawai')->unsigned()->index('etugas_tdosen_index')->nullable();
             $table->foreign('pegawai', 'etugas_tdosen_foreign')
-                ->references('id')->on('pegawai')
+                ->references('nomor')->on('pegawai')
                 ->onUpdate('cascade')
 				->onDelete('cascade');
             $table->string('file_url')->nullable();

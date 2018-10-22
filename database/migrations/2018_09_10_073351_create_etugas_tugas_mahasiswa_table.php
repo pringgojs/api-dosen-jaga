@@ -25,7 +25,7 @@ class CreateEtugasTugasMahasiswaTable extends Migration {
 				->onDelete('cascade');
 			$table->integer('kelas')->unsigned()->index('etugas_tkelasd_index')->nullable();
             $table->foreign('kelas', 'etugas_tkelasd_foreign')
-                ->references('id')->on('kelas')
+                ->references('nomor')->on('kelas')
                 ->onUpdate('cascade')
 				->onDelete('cascade');
             $table->string('file_url')->nullable();
