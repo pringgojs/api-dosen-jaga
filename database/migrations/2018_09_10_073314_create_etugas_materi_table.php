@@ -17,8 +17,8 @@ class CreateEtugasMateriTable extends Migration {
 			$table->increments('id');
 			$table->string('judul');
 			$table->text('keterangan')->nullable();
-            $table->integer('nilai_master_modul')->unsigned()->index('etugas_nilai_master_modul_index')->nullable();
-            $table->foreign('nilai_master_modul', 'etugas_nilai_master_modul_foreign')
+            $table->integer('nilai_master_modul')->unsigned()->index('etugas_nilai_master_modl_index')->nullable();
+            $table->foreign('nilai_master_modul', 'etugas_nilai_mter_modl_foreign')
                 ->references('id')->on('nilai_master_modul')
                 ->onUpdate('cascade')
 				->onDelete('cascade');
