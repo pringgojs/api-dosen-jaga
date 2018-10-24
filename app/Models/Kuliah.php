@@ -16,7 +16,18 @@ class Kuliah extends Model
 
 	public function scopeSemester($q)
     {
-        $q->select(\DB::raw("CONCAT(tahun,'/',semester ) AS semester"), 'tahun')->groupBy('tahun')->groupBy('semester')->orderBy('semester', 'DESC');
+		// oracle env
+		if (env('oracle')) {
+			$q->select(\DB::raw("(tahun || '/' || semester ) AS semester"), 'tahun')
+				->groupBy(\DB::raw("(tahun || '/' || semester )"))
+				->groupBy('tahun')
+				->orderBy('semester', 'DESC');
+		} else {
+			$q->select(\DB::raw("CONCAT(tahun,'/',semester ) AS semester"), 'tahun')
+				->groupBy('tahun')
+				->groupBy('semester')
+				->orderBy('semester', 'DESC');
+		}
 	}
 
 	public function scopeMatakuliah($q)
