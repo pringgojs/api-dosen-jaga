@@ -16,12 +16,12 @@ class Kuliah extends Model
 
 	public function scopeSemester($q)
     {
-        $q->select(\DB::raw("CONCAT(tahun,'/',semester ) AS semester"))->groupBy('tahun')->groupBy('semester')->orderBy('semester', 'DESC');
+        $q->select(\DB::raw("CONCAT(tahun,'/',semester ) AS semester"), 'tahun')->groupBy('tahun')->groupBy('semester')->orderBy('semester', 'DESC');
 	}
 
 	public function scopeMatakuliah($q)
     {
-        $q->select(\DB::raw("CONCAT(tahun,'/',semester ) AS semester"))->groupBy('tahun')->groupBy('semester')->orderBy('semester', 'DESC');
+        $q->select(\DB::raw("CONCAT(tahun,'/',semester ) AS semester"), 'tahun')->groupBy('tahun')->groupBy('semester')->orderBy('semester', 'DESC');
 	}
 
 	public function mataKuliah()
