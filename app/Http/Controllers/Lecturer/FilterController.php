@@ -19,7 +19,13 @@ class FilterController extends Controller {
 	{
 		$semester = $request->input('semester');
 		$tahun = $request->input('tahun');
-		return Kuliah::joinKelas()->select('kelas.*')->where('kuliah.tahun', $tahun)->where('kuliah.semester', $semester)->groupBy('kelas.nomor')->get();
+		return Kuliah::joinKelas()
+			->select('kelas.nomor', 'kelas.kode')
+			->where('kuliah.tahun', $tahun)
+			->where('kuliah.semester', $semester)
+			->groupBy('kelas.nomor')
+			->groupBy('kelas.kode')
+			->get();
 	}
 
 	public function getMatakuliah(Request $request)
@@ -28,14 +34,16 @@ class FilterController extends Controller {
 		$request = $request->input('request');
 		$semester = explode('/', $request['semester']);
 		$kelas = $request['kelas'];
-		return Kuliah::joinMatakuliah()->select('matakuliah.*')
+		return Kuliah::joinMatakuliah()->select('matakuliah.nomor', 'matakuliah.matakuliah')
 			->where('kuliah.tahun', $semester[0])->where('kuliah.semester', $semester[1])->where('kuliah.kelas', $kelas)
 			->where(function ($q) use ($user) {
 				foreach (Kuliah::listDosen() as $dosen) {
 					$q->orWhere($dosen, $user['id']);
 				}
 			})
-			->groupBy('matakuliah.nomor')->get();
+			->groupBy('matakuliah.nomor')
+			->groupBy('matakuliah.matakuliah')
+			->get();
 	}
 
 	public function getModul(Request $request)
