@@ -17,7 +17,7 @@ class Kuliah extends Model
 	public function scopeSemester($q)
     {
 		// oracle env
-		if (env('oracle')) {
+		if (env('production')) {
 			$q->select(\DB::raw("(tahun || '/' || semester ) AS semester"), 'tahun')
 				->groupBy(\DB::raw("(tahun || '/' || semester )"))
 				->groupBy('tahun')
@@ -32,7 +32,7 @@ class Kuliah extends Model
 
 	public function scopeMatakuliah($q)
     {
-		if (env('oracle')) {
+		if (env('production')) {
 			$q->select(\DB::raw("(tahun || '/' || semester ) AS semester"), 'tahun')
 				->groupBy(\DB::raw("(tahun || '/' || semester )"))
 				->groupBy('tahun')
