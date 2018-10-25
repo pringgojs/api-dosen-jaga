@@ -82,8 +82,8 @@ class MateriController extends Controller {
 			->where('kuliah.tahun', $materi->toKuliah->tahun)
 			->where('kuliah.semester', $materi->toKuliah->semester)
 			->where('kuliah.kelas', $materi->toKuliah->kelas)
-			->groupBy('kuliah.matakuliah')
-			->groupBy('kuliah.nomor')
+			->groupBy('matakuliah.matakuliah')
+			->groupBy('matakuliah.nomor')
 			->get();
 		$list_modul = NilaiMasterModul::where('kuliah', $materi->kuliah)->where('pengasuh', $materi->pegawai)->get();
 		$data =  NilaiMasterModul::getDataBySemester($user['id'], $materi->toKuliah)->get();
