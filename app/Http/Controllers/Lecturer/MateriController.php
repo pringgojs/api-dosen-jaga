@@ -71,20 +71,22 @@ class MateriController extends Controller {
 		$materi = Materi::find($id);
 		$list_semester = Kuliah::semester()->get();
 		$list_kelas = Kuliah::joinKelas()
-			->select('kelas.nomor, kelas.kode')
+			->select('kelas.nomor', 'kelas.kode')
 			->where('kuliah.tahun', $materi->toKuliah->tahun)
 			->where('kuliah.semester', $materi->toKuliah->semester)
-			->groupBy('kelas.kode')
 			->groupBy('kelas.nomor')
+			->groupBy('kelas.kode')
 			->get();
+
 		$list_matakuliah = Kuliah::joinMatakuliah()
-			->select('matakuliah.nomor, matakuliah.matakuliah')
-			->where('kuliah.tahun', $materi->toKuliah->tahun)
-			->where('kuliah.semester', $materi->toKuliah->semester)
-			->where('kuliah.kelas', $materi->toKuliah->kelas)
-			->groupBy('matakuliah.matakuliah')
-			->groupBy('matakuliah.nomor')
-			->get();
+		->select('matakuliah.nomor', 'matakuliah.matakuliah')
+		->where('kuliah.tahun', $materi->toKuliah->tahun)
+		->where('kuliah.semester', $materi->toKuliah->semester)
+		->where('kuliah.kelas', $materi->toKuliah->kelas)
+		->groupBy('matakuliah.matakuliah')
+		->groupBy('matakuliah.nomor')
+		->get();
+		
 		$list_modul = NilaiMasterModul::where('kuliah', $materi->kuliah)->where('pengasuh', $materi->pegawai)->get();
 		$data =  NilaiMasterModul::getDataBySemester($user['id'], $materi->toKuliah)->get();
 		return response()->json(
