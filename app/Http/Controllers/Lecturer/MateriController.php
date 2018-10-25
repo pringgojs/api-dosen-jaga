@@ -51,6 +51,7 @@ class MateriController extends Controller {
 		$materi->file_size = $file ? $file['original_size'] : null;
 		$materi->file_type = $file ? $file['original_extension'] : null;
 		$materi->created_at = date('Y-m-d h:i:s');
+		$materi->updated_at = date('Y-m-d h:i:s');
 		$materi->save();
 
 		DB::commit();
@@ -106,7 +107,7 @@ class MateriController extends Controller {
 			$materi->file_size = $file ? $file['original_size'] : null;
 			$materi->file_type = $file ? $file['original_extension'] : null;
 		}
-		$materi->created_at = date('Y-m-d h:i:s');
+		$materi->updated_at = date('Y-m-d h:i:s');
 		$materi->save();
 
 		DB::commit();

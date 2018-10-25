@@ -34,8 +34,11 @@ class FilterController extends Controller {
 		$request = $request->input('request');
 		$semester = explode('/', $request['semester']);
 		$kelas = $request['kelas'];
-		return Kuliah::joinMatakuliah()->select('matakuliah.nomor', 'matakuliah.matakuliah')
-			->where('kuliah.tahun', $semester[0])->where('kuliah.semester', $semester[1])->where('kuliah.kelas', $kelas)
+		return Kuliah::joinMatakuliah()
+			->select('matakuliah.nomor', 'matakuliah.matakuliah')
+			->where('kuliah.tahun', $semester[0])
+			->where('kuliah.semester', $semester[1])
+			->where('kuliah.kelas', $kelas)
 			->where(function ($q) use ($user) {
 				foreach (Kuliah::listDosen() as $dosen) {
 					$q->orWhere($dosen, $user['id']);
