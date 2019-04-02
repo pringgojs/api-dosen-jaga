@@ -17,7 +17,7 @@ class EtugasController extends Controller {
 		$user = $request->input('user');
 		$list_semester = Kuliah::semester()->get();
 		$list_tugas = Tugas::joinNilaiMasterModul()
-			->joinDependence($user['id'])
+			->joinDependenceNoGroup($user['id'])
 			->orderBy('kuliah.tahun', 'DESC')
 			->orderBy('kuliah.semester', 'DESC')
 			->orderBy('nilai_master_modul.nomor', 'DESC')
@@ -71,10 +71,25 @@ class EtugasController extends Controller {
 		
 		$tugas = Tugas::find($id);
 		$list_semester = Kuliah::semester()->get();
-		$list_kelas = Kuliah::joinKelas()->select(['kelas.*'])->where('kuliah.tahun', $tugas->toKuliah->tahun)->where('kuliah.semester', $tugas->toKuliah->semester)->groupBy('kuliah.kelas')->get();
-		$list_matakuliah = Kuliah::joinMatakuliah()->select(['matakuliah.*'])->where('kuliah.tahun', $tugas->toKuliah->tahun)->where('kuliah.semester', $tugas->toKuliah->semester)->where('kuliah.kelas', $tugas->toKuliah->kelas)->groupBy('kuliah.matakuliah')->get();
+		$list_kelas = Kuliah::joinKelas()
+			->select('kelas.nomor', 'kelas.kode')
+			->where('kuliah.tahun', $tugas->toKuliah->tahun)
+			->where('kuliah.semester', $tugas->toKuliah->semester)
+			->groupBy('kelas.nomor')
+			->groupBy('kelas.kode')
+			->get();
+
+		$list_matakuliah = Kuliah::joinMatakuliah()
+			->select('matakuliah.nomor', 'matakuliah.matakuliah')
+			->where('kuliah.tahun', $tugas->toKuliah->tahun)
+			->where('kuliah.semester', $tugas->toKuliah->semester)
+			->where('kuliah.kelas', $tugas->toKuliah->kelas)
+			->groupBy('matakuliah.matakuliah')
+			->groupBy('matakuliah.nomor')
+			->get();
+			
 		$list_modul = NilaiMasterModul::where('kuliah', $tugas->kuliah)->where('pengasuh', $tugas->pegawai)->get();
-		$data =  NilaiMasterModul::getDataBySemester($user['id'], $tugas->toKuliah)->get();
+		$data =  NilaiMasterModul::getDataBySemester($user['id'], $tugas->toKuliah->nomor)->get();
 		return response()->json(
 			[
 				'list_semester' => $list_semester,
@@ -155,7 +170,7 @@ class EtugasController extends Controller {
 		if (!$kuliah) return [];
 		
 		$list_tugas = Tugas::joinNilaiMasterModul()
-			->joinDependence($user['id'])
+			->joinDependenceNoGroup($user['id'])
 			->where('nilai_master_modul.kuliah', $kuliah->nomor)
 			->orderBy('kuliah.tahun', 'DESC')
 			->orderBy('kuliah.semester', 'DESC')

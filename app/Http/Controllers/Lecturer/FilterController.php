@@ -17,12 +17,18 @@ class FilterController extends Controller {
 
 	public function getKelas(Request $request)
 	{
+		$user = $request->input('user');
 		$semester = $request->input('semester');
 		$tahun = $request->input('tahun');
 		return Kuliah::joinKelas()
 			->select('kelas.nomor', 'kelas.kode')
 			->where('kuliah.tahun', $tahun)
 			->where('kuliah.semester', $semester)
+			->where(function ($q) use ($user) {
+				foreach (Kuliah::listDosen() as $dosen) {
+					$q->orWhere($dosen, $user['id']);
+				}
+			})
 			->groupBy('kelas.nomor')
 			->groupBy('kelas.kode')
 			->get();
@@ -34,6 +40,7 @@ class FilterController extends Controller {
 		$request = $request->input('request');
 		$semester = explode('/', $request['semester']);
 		$kelas = $request['kelas'];
+				
 		return Kuliah::joinMatakuliah()
 			->select('matakuliah.nomor', 'matakuliah.matakuliah')
 			->where('kuliah.tahun', $semester[0])

@@ -79,6 +79,8 @@ class NilaiMasterModul extends Model
 	
 	public function scopeGetDataByKuliahArray($q, $dosen_id, $arr_kuliah)
     {
+		$arr_kuliah = array_fetch($arr_kuliah, 'kuliah');
+		
         $q->joinDependence($dosen_id)
 			->whereIn('nilai_master_modul.kuliah', $arr_kuliah)
 			->orderBy('kuliah.tahun', 'DESC')

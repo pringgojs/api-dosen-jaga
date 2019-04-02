@@ -4,6 +4,7 @@ use App\Models\Nilai;
 use App\Http\Requests;
 use App\Models\Kuliah;
 use App\Models\Materi;
+use App\Models\NilaiModul;
 use Illuminate\Http\Request;
 use App\Models\NilaiMasterModul;
 use App\Http\Controllers\Controller;
@@ -25,16 +26,28 @@ class FilterController extends Controller {
 		$type = $request->input('type');
 		$user = $request->input('user');
 		if ($type == 'materi') {
-			return Nilai::joinKuliah()->joinMateri()->joinKelas()->select(['kelas.*'])->where('nilai.mahasiswa', $user['id'])->groupBy('kelas.nomor')->get();
+			return NilaiModul::joinKuliah()
+				->joinMateri()
+				->joinKelas()
+				->select('kelas.nomor', 'kelas.kode')
+				->where('nilai_modul.mahasiswa', $user['id'])
+				->groupBy('kelas.nomor')
+				->groupBy('kelas.kode')
+				->get();
 		}
 
 		if ($type == 'tugas') {
-			return Nilai::joinKuliah()->joinTugas()->joinKelas()->select(['kelas.*'])->where('nilai.mahasiswa', $user['id'])->groupBy('kelas.nomor')->get();
+			return NilaiModul::joinKuliah()
+				->joinTugas()
+				->joinKelas()
+				->select('kelas.nomor', 'kelas.kode')
+				->where('nilai_modul.mahasiswa', $user['id'])
+				->groupBy('kelas.nomor')
+				->groupBy('kelas.kode')
+				->get();
 		}
 
 		return [];
-
-		return Kuliah::joinKelas()->select('kelas.*')->where('kuliah.tahun', $tahun)->where('kuliah.semester', $semester)->groupBy('kelas.nomor')->get();
 	}
 
 	public function getMatakuliah(Request $request)
@@ -43,9 +56,13 @@ class FilterController extends Controller {
 		$request = $request->input('request');
 		$semester = explode('/', $request['semester']);
 		$kelas = $request['kelas'];
-		return Kuliah::joinMatakuliah()->select('matakuliah.*')
-			->where('kuliah.tahun', $semester[0])->where('kuliah.semester', $semester[1])->where('kuliah.kelas', $kelas)
+		return Kuliah::joinMatakuliah()
+			->select('matakuliah.nomor', 'matakuliah.matakuliah')
+			->where('kuliah.tahun', $semester[0])
+			->where('kuliah.semester', $semester[1])
+			->where('kuliah.kelas', $kelas)
 			->groupBy('matakuliah.nomor')
+			->groupBy('matakuliah.matakuliah')
 			->get();
 	}
 

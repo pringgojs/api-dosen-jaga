@@ -33,9 +33,8 @@ class Tugas extends Model
         return $this->belongsTo('App\Models\Pegawai', 'pegawai');
 	}
 	
-
-	public function scopeJoinDependence($q, $dosen_id)
-    {
+	public function scopeJoinDependenceNoGroup($q, $dosen_id)
+	{
 		$q->joinKuliah()->joinMatakuliah()->joinKelas()->joinJurusan()->joinProgram()
 			->where('nilai_master_modul.pengasuh', $dosen_id)
 			->select([
@@ -57,6 +56,34 @@ class Tugas extends Model
 				'etugas_tugas.due_date',
 				'etugas_tugas.id',
 			]);
+	}
+	
+	public function scopeJoinDependence($q, $dosen_id)
+    {
+		$q->joinKuliah()->joinMatakuliah()->joinKelas()->joinJurusan()->joinProgram()
+			->where('nilai_master_modul.pengasuh', $dosen_id)
+			->select(
+				'kuliah.tahun',
+				'kuliah.semester',
+				'matakuliah.matakuliah',
+				'jurusan.jurusan',
+				'program.program',
+				'kelas.pararel',
+				'kelas.kelas',
+				'nilai_master_modul.kuliah',
+				'nilai_master_modul.modul',
+                'nilai_master_modul.nomor as nomor_nilai_master_modul'
+			)
+			->groupBy('kuliah.tahun')
+			->groupBy('kuliah.semester')
+			->groupBy('matakuliah.matakuliah')
+			->groupBy('jurusan.jurusan')
+			->groupBy('program.program')
+			->groupBy('kelas.pararel')
+			->groupBy('kelas.kelas')
+			->groupBy('nilai_master_modul.kuliah')
+			->groupBy('nilai_master_modul.modul')
+			->groupBy('nilai_master_modul.nomor');
     }
     
 	public function scopeJoinNilaiMasterModul($q)

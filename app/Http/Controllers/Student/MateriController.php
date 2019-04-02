@@ -23,8 +23,8 @@ class MateriController extends Controller {
 		 */
 		$user = $request->input('user');
 		$student = Mahasiswa::find($user['id']);
-		$list_semester = Nilai::joinKuliah()->joinMateri()->semester()->where('nilai.mahasiswa', $student->nomor)->get();
-		$kuliah = Nilai::joinKuliah()->joinMateri()->select(['kuliah.*'])->where('nilai.mahasiswa', $student->nomor)->groupBy('kuliah.nomor')->first();
+		$list_semester = NilaiModul::joinKuliah()->joinMateri()->semester()->where('nilai_modul.mahasiswa', $student->nomor)->get();
+		$kuliah = NilaiModul::joinKuliah()->joinMateri()->select(['kuliah.*'])->where('nilai_modul.mahasiswa', $student->nomor)->orderBy('kuliah.nomor', 'DESC')->first();
 		$list_materi = Materi::getDataMateri($kuliah->kelas, $kuliah->nomor)->get();
 		return response()->json(
 			[

@@ -41,6 +41,16 @@ class NilaiModul extends Model
     
     public function scopeSemester($q)
     {
-        $q->select(\DB::raw("CONCAT(kuliah.tahun,'/',kuliah.semester ) AS semester"))->groupBy('kuliah.tahun')->groupBy('kuliah.semester')->orderBy('kuliah.semester', 'DESC');
+       if (\App::environment('production')) {
+			$q->select(\DB::raw("(kuliah.tahun || '/' || kuliah.semester ) AS semester"), 'kuliah.tahun')
+                ->groupBy('kuliah.tahun')
+                ->groupBy('kuliah.semester')
+				->orderBy('kuliah.semester', 'DESC');
+		} else {
+			$q->select(\DB::raw("CONCAT(kuliah.tahun,'/',kuliah.semester ) AS semester"))
+            ->groupBy('kuliah.tahun')
+            ->groupBy('kuliah.semester')
+            ->orderBy('kuliah.semester', 'DESC');
+        }
 	}
 }

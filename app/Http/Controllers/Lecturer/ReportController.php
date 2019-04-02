@@ -30,7 +30,6 @@ class ReportController extends Controller {
 			->orderBy('kuliah.semester', 'DESC')
 			->orderBy('nilai_master_modul.nomor', 'DESC')
 			->where('nilai_master_modul.pengasuh', $user['id'])
-			->groupBy('nilai_master_modul.nomor')
 			->get();
 		$list_tugas = $list_tugas->map(function ($item) use($kuliah, $user ){
 			$item['total_tugas'] = Tugas::where('nilai_master_modul', $item->nomor_nilai_master_modul)->where('kuliah', $kuliah)->where('pegawai', $user['id'])->count();
