@@ -3,6 +3,8 @@
 use App\Helpers\AuthHelper;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Mahasiswa;
+use App\Models\Pegawai;
 
 class LoginController extends Controller {
 
@@ -34,5 +36,33 @@ class LoginController extends Controller {
                 ]
             );
 		}
+	}
+
+	public function resetPassword(Request $request)
+	{
+		
+		$password = $request->input('password');
+		$user = $request->input('user');
+		$password = crypt($password, 1234567890);
+
+		if ($user['type'] == 'student') {
+			$student = Mahasiswa::find($user['id']);
+			$student->password = $password;
+			$student->save();
+		}
+
+		if ($user['type'] == 'lecturer') {
+			$lecturer = Pegawai::find($user['id']);
+			$lecturer->password = $password;
+			$lecturer->save();
+		}
+
+		return response()->json(
+			[
+				'code' => 200,
+				'data' => 'success'
+			]
+		);
+		
 	}
 }

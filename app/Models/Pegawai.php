@@ -7,7 +7,7 @@ class Pegawai extends Model
 {
 	protected $table = 'pegawai';   
 	protected $primaryKey = 'nomor';
-	public $timestamps = true;
+	public $timestamps = false;
 
 	public function programStudy()
     {
