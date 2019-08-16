@@ -12,6 +12,7 @@
 */
 Route::group(['prefix' => 'api'], function ()   {
     Route::post('login', 'LoginController@login');
+    Route::post('reset-password', 'LoginController@resetPassword');
 	
 	// lecturer
 	Route::group(['prefix' => 'lecturer', 'namespace' => 'Lecturer'], function ()   {
