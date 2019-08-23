@@ -40,10 +40,9 @@ class LoginController extends Controller {
 
 	public function resetPassword(Request $request)
 	{
-		
-		$password = $request->input('password');
+		$req = $request->input('request');
 		$user = $request->input('user');
-		$password = crypt($password, 1234567890);
+		$password = crypt($req['password'], 1234567890);
 
 		if ($user['type'] == 'student') {
 			$student = Mahasiswa::find($user['id']);
