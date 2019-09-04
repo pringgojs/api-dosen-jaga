@@ -2,7 +2,9 @@
 
 use App\Models\Tugas;
 use App\Http\Requests;
+use App\Models\Jurusan;
 use App\Models\Kuliah;
+use App\Models\Program;
 use App\Models\NilaiModul;
 use Illuminate\Http\Request;
 use App\Models\NilaiMahasiswa;
@@ -14,8 +16,12 @@ class EtugasController extends Controller {
 
 	public function index(Request $request)
 	{
+		info($request);
+
 		$user = $request->input('user');
 		$list_semester = Kuliah::semester()->get();
+		$list_program = Program::orderBy('program')->get();
+		$list_jurusan = Jurusan::all();
 		$list_tugas = Tugas::joinNilaiMasterModul()
 			->joinDependenceNoGroup($user['id'])
 			->orderBy('kuliah.tahun', 'DESC')
@@ -23,11 +29,31 @@ class EtugasController extends Controller {
 			->orderBy('nilai_master_modul.nomor', 'DESC')
 			->where('nilai_master_modul.pengasuh', $user['id'])
 			->get();
+		$list_tugas = [];
+		info($list_tugas);
 		
 		return response()->json(
 			[
 				'list_semester' => $list_semester,
 				'list_tugas' => $list_tugas,
+				'list_jurusan' => $list_jurusan,
+				'list_program' => $list_program,
+			]
+		);
+	}
+
+	public function create(Request $request)
+	{
+		$user = $request->input('user');
+		$list_semester = Kuliah::semester()->get();
+		$list_program = Program::orderBy('program')->get();
+		$list_jurusan = Jurusan::all();
+		
+		return response()->json(
+			[
+				'list_semester' => $list_semester,
+				'list_jurusan' => $list_jurusan,
+				'list_program' => $list_program,
 			]
 		);
 	}

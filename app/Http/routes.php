@@ -41,6 +41,7 @@ Route::group(['prefix' => 'api'], function ()   {
 		Route::post('e-tugas/edit/{id}', 'EtugasController@edit');
 		Route::post('e-tugas/delete/{id}', 'EtugasController@delete');
 		Route::post('e-tugas/store', 'EtugasController@store');
+		Route::post('e-tugas/create', 'EtugasController@create');
 		Route::post('e-tugas', 'EtugasController@index');
 
 		Route::post('index', 'LecturerController@index');

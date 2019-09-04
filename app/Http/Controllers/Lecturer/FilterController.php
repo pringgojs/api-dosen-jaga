@@ -3,7 +3,9 @@
 use App\Models\Nilai;
 use App\Http\Requests;
 
+use App\Models\KelasSemester;
 use App\Models\Kuliah;
+use App\Models\Kelas;
 use Illuminate\Http\Request;
 use App\Models\NilaiMasterModul;
 use App\Http\Controllers\Controller;
@@ -39,9 +41,20 @@ class FilterController extends Controller {
 		$user = $request->input('user');
 		$request = $request->input('request');
 		$semester = explode('/', $request['semester']);
-		$kelas = $request['kelas'];
-				
-		return Kuliah::joinMatakuliah()
+		$program = $request['program'];
+		$jurusan = $request['jurusan'];
+		$pararel = $request['pararel'];
+		$semester_tempuh = $request['semester_tempuh'];
+		$kelas_semester = KelasSemester::where('semester', $semester_tempuh)->first();
+		$kelas_semester = $kelas_semester ? $kelas_semester->kelas : 0;
+		$kelas = Kelas::where('program', $program)
+			->where('jurusan', $jurusan)
+			->where('kelas', $kelas_semester)
+			->where('pararel', $pararel)
+			->first();
+		$kelas = $kelas ? $kelas->nomor : 0;
+
+		$list_matakuliah = Kuliah::joinMatakuliah()
 			->select('matakuliah.nomor', 'matakuliah.matakuliah')
 			->where('kuliah.tahun', $semester[0])
 			->where('kuliah.semester', $semester[1])
@@ -54,6 +67,11 @@ class FilterController extends Controller {
 			->groupBy('matakuliah.nomor')
 			->groupBy('matakuliah.matakuliah')
 			->get();
+		
+		return [
+			'list_matakuliah' => $list_matakuliah,
+			'kelas' => $kelas,
+		];
 	}
 
 	public function getModul(Request $request)
