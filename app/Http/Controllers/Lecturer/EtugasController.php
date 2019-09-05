@@ -5,6 +5,7 @@ use App\Http\Requests;
 use App\Models\Jurusan;
 use App\Models\Kuliah;
 use App\Models\Program;
+use App\Models\KelasSemester;
 use App\Models\NilaiModul;
 use Illuminate\Http\Request;
 use App\Models\NilaiMahasiswa;
@@ -16,21 +17,13 @@ class EtugasController extends Controller {
 
 	public function index(Request $request)
 	{
-		info($request);
-
 		$user = $request->input('user');
 		$list_semester = Kuliah::semester()->get();
 		$list_program = Program::orderBy('program')->get();
 		$list_jurusan = Jurusan::all();
-		$list_tugas = Tugas::joinNilaiMasterModul()
-			->joinDependenceNoGroup($user['id'])
-			->orderBy('kuliah.tahun', 'DESC')
-			->orderBy('kuliah.semester', 'DESC')
-			->orderBy('nilai_master_modul.nomor', 'DESC')
-			->where('nilai_master_modul.pengasuh', $user['id'])
+		$list_tugas = Tugas::with(['toKelas', 'toKuliah', 'toProgram', 'toProgram', 'toJurusan', 'toMatakuliah', 'nilaiMasterModul', 'toPegawai'])
+			->where('pegawai', $user['id'])
 			->get();
-		$list_tugas = [];
-		info($list_tugas);
 		
 		return response()->json(
 			[
@@ -70,6 +63,9 @@ class EtugasController extends Controller {
 		$tugas = new Tugas;
 		$tugas->judul = $request['judul'];
 		$tugas->keterangan = $request['keterangan'];
+		$tugas->program = $request['program'];
+		$tugas->jurusan = $request['jurusan'];
+		$tugas->matakuliah = $request['matakuliah'];
 		$tugas->kuliah = $nilai_master_modul->kuliah;
 		$tugas->kelas = $kuliah->kelas;
 		$tugas->nilai_master_modul = $request['nilai_master_modul'];
@@ -94,35 +90,41 @@ class EtugasController extends Controller {
 	public function edit(Request $request, $id)
 	{
 		$user = $request->input('user');
-		
-		$tugas = Tugas::find($id);
+		$list_program = Program::orderBy('program')->get();
+		$list_jurusan = Jurusan::all();
+		$tugas = Tugas::where('id', $id)->with(['toKelas', 'toKuliah', 'toProgram', 'toProgram', 'toJurusan', 'toMatakuliah', 'toPegawai'])->first();
 		$list_semester = Kuliah::semester()->get();
-		$list_kelas = Kuliah::joinKelas()
-			->select('kelas.nomor', 'kelas.kode')
-			->where('kuliah.tahun', $tugas->toKuliah->tahun)
-			->where('kuliah.semester', $tugas->toKuliah->semester)
-			->groupBy('kelas.nomor')
-			->groupBy('kelas.kode')
-			->get();
+		
+		// cek semester tempuh
+		$semester_tempuh = ($tugas->toKelas->kelas * 2 ) - 1;
+		if (($tugas->toKuliah->semester % 2) == 0) {
+			$semester_tempuh = $tugas->toKelas->kelas * 2;
+		}
 
 		$list_matakuliah = Kuliah::joinMatakuliah()
 			->select('matakuliah.nomor', 'matakuliah.matakuliah')
 			->where('kuliah.tahun', $tugas->toKuliah->tahun)
 			->where('kuliah.semester', $tugas->toKuliah->semester)
 			->where('kuliah.kelas', $tugas->toKuliah->kelas)
+			->where(function ($q) use ($user) {
+				foreach (Kuliah::listDosen() as $dosen) {
+					$q->orWhere($dosen, $user['id']);
+				}
+			})
 			->groupBy('matakuliah.matakuliah')
 			->groupBy('matakuliah.nomor')
 			->get();
 			
 		$list_modul = NilaiMasterModul::where('kuliah', $tugas->kuliah)->where('pengasuh', $tugas->pegawai)->get();
-		$data =  NilaiMasterModul::getDataBySemester($user['id'], $tugas->toKuliah->nomor)->get();
 		return response()->json(
 			[
 				'list_semester' => $list_semester,
-				'list_kelas' => $list_kelas,
 				'list_matakuliah' => $list_matakuliah,
 				'list_modul' => $list_modul,
+				'list_program' => $list_program,
+				'list_jurusan' => $list_jurusan,
 				'kuliah' =>  $tugas->toKuliah,
+				'semester_tempuh' => $semester_tempuh,
 				'tugas' =>  $tugas,
 			]
 		);
@@ -142,6 +144,9 @@ class EtugasController extends Controller {
 		$tugas->keterangan = $request['keterangan'];
 		$tugas->kuliah = $nilai_master_modul->kuliah;
 		$tugas->kelas = $kuliah->kelas;
+		$tugas->program = $request['program'];
+		$tugas->jurusan = $request['jurusan'];
+		$tugas->matakuliah = $request['matakuliah'];
 		$tugas->nilai_master_modul = $request['nilai_master_modul'];
 		$tugas->pegawai = $nilai_master_modul->pengasuh;
 		if ($file) {

@@ -18,6 +18,21 @@ class Tugas extends Model
         return $this->belongsTo('App\Models\Kuliah', 'kuliah');
 	}
 
+	public function toProgram()
+    {
+        return $this->belongsTo('App\Models\Program', 'program');
+	}
+
+	public function toJurusan()
+    {
+        return $this->belongsTo('App\Models\Jurusan', 'jurusan');
+	}
+
+	public function toMatakuliah()
+    {
+        return $this->belongsTo('App\Models\Matakuliah', 'matakuliah');
+	}
+
 	public function nilaiMasterModul()
     {
         return $this->belongsTo('App\Models\NilaiMasterModul', 'nilai_master_modul');

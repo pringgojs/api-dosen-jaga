@@ -17,7 +17,6 @@ class AddColumnETugasTable extends Migration {
                 $table->integer('program')->nullable();
                 $table->integer('jurusan')->nullable();
                 $table->integer('matakuliah')->nullable();
-                $table->integer('dosen')->nullable();
             });
         }
 	}
