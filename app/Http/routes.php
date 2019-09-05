@@ -31,6 +31,7 @@ Route::group(['prefix' => 'api'], function ()   {
 		Route::post('materi/filter', 'MateriController@filter');
 		Route::post('materi/delete/{id}', 'MateriController@delete');
 		Route::post('materi/store', 'MateriController@store');
+		Route::post('materi/create', 'MateriController@create');
 		Route::post('materi', 'MateriController@index');
 
 		// etugas

@@ -3,6 +3,8 @@
 use App\Http\Requests;
 use App\Models\Kuliah;
 use App\Models\Materi;
+use App\Models\Jurusan;
+use App\Models\Program;
 use Illuminate\Http\Request;
 use App\Models\NilaiMasterModul;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +16,8 @@ class MateriController extends Controller {
 	{
 		$user = $request->input('user');
 		$list_semester = Kuliah::semester()->get();
+		$list_program = Program::orderBy('program')->get();
+		$list_jurusan = Jurusan::all();
 		$list_materi = Materi::joinNilaiMasterModul()
 			->joinDependence($user['id'])
 			->orderBy('kuliah.tahun', 'DESC')
@@ -26,6 +30,24 @@ class MateriController extends Controller {
 			[
 				'list_materi' => $list_materi,
 				'list_semester' => $list_semester,
+				'list_jurusan' => $list_jurusan,
+				'list_program' => $list_program,
+			]
+		);
+	}
+
+	public function create(Request $request)
+	{
+		$user = $request->input('user');
+		$list_semester = Kuliah::semester()->get();
+		$list_program = Program::orderBy('program')->get();
+		$list_jurusan = Jurusan::all();
+		
+		return response()->json(
+			[
+				'list_semester' => $list_semester,
+				'list_jurusan' => $list_jurusan,
+				'list_program' => $list_program,
 			]
 		);
 	}
@@ -35,7 +57,6 @@ class MateriController extends Controller {
 		$user = $request->input('user');
 		$file = $request->input('file');
 		$request = $request->input('request');
-		
 		$nilai_master_modul = NilaiMasterModul::find($request['nilai_master_modul']);
 		$kuliah = Kuliah::find($nilai_master_modul->kuliah);
 
@@ -43,6 +64,9 @@ class MateriController extends Controller {
 		$materi = new Materi;
 		$materi->judul = $request['judul'];
 		$materi->keterangan = $request['keterangan'];
+		$materi->program = $request['program'];
+		$materi->jurusan = $request['jurusan'];
+		$materi->matakuliah = $request['matakuliah'];
 		$materi->kuliah = $nilai_master_modul->kuliah;
 		$materi->pegawai = $nilai_master_modul->pengasuh;
 		$materi->kelas = $kuliah->kelas;
@@ -67,38 +91,41 @@ class MateriController extends Controller {
 	public function edit(Request $request, $id)
 	{
 		$user = $request->input('user');
-		
-		$materi = Materi::find($id);
+		$materi = Materi::where('id', $id)->with(['toKelas', 'toKuliah', 'toProgram', 'toProgram', 'toJurusan', 'toMatakuliah', 'toPegawai'])->first();
+		$list_program = Program::orderBy('program')->get();
+		$list_jurusan = Jurusan::all();
 		$list_semester = Kuliah::semester()->get();
-		$list_kelas = Kuliah::joinKelas()
-			->select('kelas.nomor', 'kelas.kode')
-			->where('kuliah.tahun', $materi->toKuliah->tahun)
-			->where('kuliah.semester', $materi->toKuliah->semester)
-			->groupBy('kelas.nomor')
-			->groupBy('kelas.kode')
-			->get();
 		
+		// cek semester tempuh
+		$semester_tempuh = ($materi->toKelas->kelas * 2 ) - 1;
+		if (($materi->toKuliah->semester % 2) == 0) {
+			$semester_tempuh = $materi->toKelas->kelas * 2;
+		}
+
 		$list_matakuliah = Kuliah::joinMatakuliah()
 			->select('matakuliah.nomor', 'matakuliah.matakuliah')
 			->where('kuliah.tahun', $materi->toKuliah->tahun)
 			->where('kuliah.semester', $materi->toKuliah->semester)
 			->where('kuliah.kelas', $materi->toKuliah->kelas)
+			->where(function ($q) use ($user) {
+				foreach (Kuliah::listDosen() as $dosen) {
+					$q->orWhere($dosen, $user['id']);
+				}
+			})
 			->groupBy('matakuliah.matakuliah')
 			->groupBy('matakuliah.nomor')
 			->get();
-		\Log::info(1);
 		
 		$list_modul = NilaiMasterModul::where('kuliah', $materi->kuliah)->where('pengasuh', $materi->pegawai)->get();
-		\Log::info($list_modul);
-		$data =  NilaiMasterModul::getDataBySemester($user['id'], $materi->toKuliah->nomor)->get();
-		\Log::info(2);
 		return response()->json(
 			[
 				'list_semester' => $list_semester,
-				'list_kelas' => $list_kelas,
 				'list_matakuliah' => $list_matakuliah,
 				'list_modul' => $list_modul,
+				'list_program' => $list_program,
+				'list_jurusan' => $list_jurusan,
 				'kuliah' =>  $materi->toKuliah,
+				'semester_tempuh' => $semester_tempuh,
 				'materi' =>  $materi,
 			]
 		);
@@ -116,6 +143,9 @@ class MateriController extends Controller {
 		$materi = Materi::find($id);
 		$materi->judul = $request['judul'];
 		$materi->keterangan = $request['keterangan'];
+		$materi->program = $request['program'];
+		$materi->jurusan = $request['jurusan'];
+		$materi->matakuliah = $request['matakuliah'];
 		$materi->kuliah = $nilai_master_modul->kuliah;
 		$materi->kelas = $kuliah->kelas;
 		$materi->nilai_master_modul = $request['nilai_master_modul'];

@@ -22,6 +22,26 @@ class Materi extends Model
     {
         return $this->belongsTo('App\Models\NilaiMasterModul', 'nilai_master_modul');
 	}
+
+	public function toProgram()
+    {
+        return $this->belongsTo('App\Models\Program', 'program');
+	}
+
+	public function toJurusan()
+    {
+        return $this->belongsTo('App\Models\Jurusan', 'jurusan');
+	}
+
+	public function toMatakuliah()
+    {
+        return $this->belongsTo('App\Models\Matakuliah', 'matakuliah');
+	}
+
+	public function toPegawai()
+    {
+        return $this->belongsTo('App\Models\Pegawai', 'pegawai');
+	}
 	
     public function scopeJoinDependence($q, $dosen_id)
     {
