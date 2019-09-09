@@ -21,9 +21,9 @@ class FixMateriSeeder extends Seeder {
 			$materi->kuliah = $materi->nilaiMasterModul->kuliah;
 			$materi->pegawai = $materi->nilaiMasterModul->pengasuh;
 			$materi->save();
+			echo $materi->id;
 		}
 
-		echo "1";
 	}
 
 }

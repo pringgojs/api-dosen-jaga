@@ -19,6 +19,7 @@ class FixEtugasSeeder extends Seeder {
 			$tugas->jurusan = $tugas->toKelas->jurusan;
 			$tugas->matakuliah = $tugas->nilaiMasterModul->toKuliah->matakuliah;
 			$tugas->save();
+			echo $tugas->id;
 		}
 	}
 
