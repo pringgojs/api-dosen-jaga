@@ -17,8 +17,6 @@ class AddColumnEMateriTable extends Migration {
                 $table->integer('program')->nullable();
                 $table->integer('jurusan')->nullable();
                 $table->integer('matakuliah')->nullable();
-                $table->integer('kuliah')->nullable();
-                $table->integer('pegawai')->nullable();
             });
         }
 	}
@@ -34,8 +32,6 @@ class AddColumnEMateriTable extends Migration {
             $table->dropColumn('program');
             $table->dropColumn('jurusan');
             $table->dropColumn('matakuliah');
-            $table->dropColumn('kuliah');
-            $table->dropColumn('pegawai');
         });
 	}
 

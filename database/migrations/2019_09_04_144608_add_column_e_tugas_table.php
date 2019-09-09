@@ -32,7 +32,6 @@ class AddColumnETugasTable extends Migration {
             $table->dropColumn('program');
             $table->dropColumn('jurusan');
             $table->dropColumn('matakuliah');
-            $table->dropColumn('dosen');
         });
 	}
 
