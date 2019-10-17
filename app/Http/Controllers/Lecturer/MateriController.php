@@ -18,14 +18,8 @@ class MateriController extends Controller {
 		$list_semester = Kuliah::semester()->get();
 		$list_program = Program::orderBy('program')->get();
 		$list_jurusan = Jurusan::all();
-		$list_materi = Materi::joinNilaiMasterModul()
-			->joinDependence($user['id'])
-			->orderBy('kuliah.tahun', 'DESC')
-			->orderBy('kuliah.semester', 'DESC')
-			->orderBy('nilai_master_modul.nomor', 'DESC')
-			->where('nilai_master_modul.pengasuh', $user['id'])
-			->get();
-
+		$list_materi = Materi::where('pegawai', $user['id'])->with(['toKelas', 'toKuliah', 'nilaiMasterModul', 'toProgram', 'toJurusan', 'toMatakuliah', 'toPegawai'])->get();
+		
 		return response()->json(
 			[
 				'list_materi' => $list_materi,
@@ -199,14 +193,10 @@ class MateriController extends Controller {
 			})
 			->first();
 		if (!$kuliah) return [];
-		
-		$list_materi = Materi::joinNilaiMasterModul()
-			->joinDependence($user['id'])
-			->where('nilai_master_modul.kuliah', $kuliah->nomor)
-			->orderBy('kuliah.tahun', 'DESC')
-			->orderBy('kuliah.semester', 'DESC')
-			->orderBy('nilai_master_modul.nomor', 'DESC')
-			->where('nilai_master_modul.pengasuh', $user['id'])
+
+		$list_materi = Materi::where('pegawai', $user['id'])
+			->where('kuliah', $kuliah->nomor)
+			->with(['toKelas', 'toKuliah', 'nilaiMasterModul', 'toProgram', 'toJurusan', 'toMatakuliah', 'toPegawai'])
 			->get();
 
 		return $list_materi;

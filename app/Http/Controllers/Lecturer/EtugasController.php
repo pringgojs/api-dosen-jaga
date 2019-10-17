@@ -200,14 +200,10 @@ class EtugasController extends Controller {
 			->first();
 		if (!$kuliah) return [];
 		
-		$list_tugas = Tugas::joinNilaiMasterModul()
-			->joinDependenceNoGroup($user['id'])
-			->where('nilai_master_modul.kuliah', $kuliah->nomor)
-			->orderBy('kuliah.tahun', 'DESC')
-			->orderBy('kuliah.semester', 'DESC')
-			->orderBy('nilai_master_modul.nomor', 'DESC')
-			->where('nilai_master_modul.pengasuh', $user['id'])
-			->get();
+		$list_tugas = Tugas::with(['toKelas', 'toKuliah', 'toProgram', 'toProgram', 'toJurusan', 'toMatakuliah', 'nilaiMasterModul', 'toPegawai'])
+			->where('kuliah', $kuliah->nomor)
+            ->where('pegawai', $user['id'])
+            ->get();
 
 		return $list_tugas;
 	}
