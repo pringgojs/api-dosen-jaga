@@ -1,12 +1,13 @@
 <?php namespace App\Http\Controllers\Lecturer;
 
-use App\Models\Nilai;
-use App\Http\Requests;
-
-use App\Models\KelasSemester;
-use App\Models\Kuliah;
 use App\Models\Kelas;
+use App\Models\Nilai;
+
+use App\Http\Requests;
+use App\Models\Kuliah;
+use App\Models\Jurusan;
 use Illuminate\Http\Request;
+use App\Models\KelasSemester;
 use App\Models\NilaiMasterModul;
 use App\Http\Controllers\Controller;
 
@@ -34,6 +35,25 @@ class FilterController extends Controller {
 			->groupBy('kelas.nomor')
 			->groupBy('kelas.kode')
 			->get();
+	}
+
+	public function getJurusan(Request $request)
+	{
+		$user = $request->input('user');
+		$semester = $request->input('semester');
+		$tahun = $request->input('tahun');
+		$list_jurusan = Kuliah::joinKelas()
+			->where('kuliah.tahun', $tahun)
+			->where('kuliah.semester', $semester)
+			->where(function ($q) use ($user) {
+				foreach (Kuliah::listDosen() as $dosen) {
+					$q->orWhere($dosen, $user['id']);
+				}
+			})
+			->select('kelas.jurusan')
+			->groupBy('kelas.jurusan')
+			->get()->toArray();
+		return Jurusan::whereIn('nomor', $list_jurusan)->get();
 	}
 
 	public function getMatakuliah(Request $request)

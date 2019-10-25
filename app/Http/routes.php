@@ -73,6 +73,7 @@ Route::group(['prefix' => 'api'], function ()   {
 			Route::post('get-modul', 'FilterController@getModul');
 			Route::post('get-matakuliah', 'FilterController@getMatakuliah');
 			Route::post('get-kelas', 'FilterController@getKelas');
+			Route::post('get-jurusan', 'FilterController@getJurusan');
 			Route::get('get-semester', 'FilterController@getSemester');
 		});
 
