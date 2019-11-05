@@ -245,7 +245,7 @@ class EtugasController extends Controller {
 
 		DB::commit();
 		$tugas = $nilai_mahasiswa->tugas;
-		$list_mahasiswa = NilaiModul::joinMahasiswa()->where('nilai_modul.kuliah', $tugas->kuliah)->select('nilai_modul.mahasiswa')->select(['mahasiswa.*'])->get();
+		$list_mahasiswa = NilaiModul::joinMahasiswa()->where('nilai_modul.kuliah', $tugas->kuliah)->select('nilai_modul.mahasiswa')->select(['mahasiswa.nomor', 'mahasiswa.nrp', 'mahasiswa.nama'])->groupBy(['mahasiswa.nomor', 'mahasiswa.nrp', 'mahasiswa.nama'])->get();
 		$kelas_mahasiswa = $list_mahasiswa->map(function ($item) use ($tugas) {
 			$item['nilai'] = NilaiMahasiswa::where('tugas_id', $tugas->id)->where('nrp', $item['nrp'])->first();
 			return $item;
