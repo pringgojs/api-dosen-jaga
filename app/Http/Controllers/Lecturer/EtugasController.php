@@ -212,7 +212,7 @@ class EtugasController extends Controller {
 	{
 		$user = $request->input('user');
 		$etugas = Tugas::find($id);
-		$list_mahasiswa = NilaiModul::joinMahasiswa()->where('nilai_modul.kuliah', $etugas->kuliah)->select('nilai_modul.mahasiswa')->select(['mahasiswa.*'])->get();
+		$list_mahasiswa = NilaiModul::joinMahasiswa()->where('nilai_modul.kuliah', $etugas->kuliah)->select('nilai_modul.mahasiswa')->select(['mahasiswa.nomor', 'mahasiswa.nrp', 'mahasiswa.nama'])->groupBy(['mahasiswa.nomor', 'mahasiswa.nrp', 'mahasiswa.nama'])->get();
 		$kelas_mahasiswa = $list_mahasiswa->map(function ($item) use ($etugas) {
 			$item['nilai'] = NilaiMahasiswa::where('tugas_id', $etugas->id)->where('nrp', $item['nrp'])->first();
 			return $item;
